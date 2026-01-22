@@ -91,9 +91,11 @@ export default function VerifyCodeScreen() {
             { backgroundColor: isComplete ? '#2563EB' : '#b1c1f5be' },
           ]}
           disabled={!isComplete}
+          onPress={() => router.push('/reset-password')}
         >
           <Text style={styles.verifyText}>Verificar Código</Text>
         </TouchableOpacity>
+        
 
         {/* REENVIAR */}
         <Text style={styles.resendText}>

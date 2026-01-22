@@ -3,18 +3,17 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
-  Image,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 
 export default function LoginScreen() {
   const router = useRouter();
-  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -52,26 +51,17 @@ export default function LoginScreen() {
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
-            placeholder="************"
+            placeholder="********"
             placeholderTextColor="#9CA3AF"
-            secureTextEntry={!passwordVisible}
-
+            secureTextEntry={!showPassword}
           />
-          <TouchableOpacity
-              onPress={() => setPasswordVisible(!passwordVisible)}
-            >
-              <Image
-                source={
-                  passwordVisible
-                    ? require('../assets/images/open-eyes-password.png')
-                    : require('../assets/images/eyes-password.png')
-                }
-                style={styles.eyeIcon}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-            
-
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Ionicons
+              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={22}
+              color="#2563EB"
+            />
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity onPress={() => router.push('forgot-password')}>
@@ -255,7 +245,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 16,
-    marginBottom: 24,
+    marginBottom: 15,
   },
 
   socialButton: {
@@ -269,6 +259,7 @@ const styles = StyleSheet.create({
 
   signupText: {
     textAlign: 'center',
+
     fontSize: 13,
   },
 

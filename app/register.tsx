@@ -118,7 +118,7 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
@@ -178,9 +178,9 @@ const styles = StyleSheet.create({
 
   terms: {
     textAlign: 'center',
-    fontSize: 12,
-    marginBottom: 12,
-    marginTop: 14,
+    fontSize: 13,
+    marginBottom: 15,
+    marginTop: 10,
   },
 
   link: {
@@ -204,13 +204,13 @@ const styles = StyleSheet.create({
 
   registerText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 22,
     fontFamily: 'LeagueSpartan-SemiBold',
   },
 
   orText: {
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: 13,
     marginBottom: 12,
     marginTop: 12,
   },
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 16,
-    marginBottom: 20,
+    marginBottom: 15,
   },
 
   socialButton: {
@@ -233,6 +233,6 @@ const styles = StyleSheet.create({
 
   footer: {
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: 13,
   },
 });
