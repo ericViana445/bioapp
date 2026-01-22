@@ -3,12 +3,12 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
-    Image,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 
@@ -74,9 +74,10 @@ export default function LoginScreen() {
 
         </View>
 
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push('forgot-password')}>
           <Text style={styles.forgot}>Esqueci minha senha</Text>
         </TouchableOpacity>
+                      
 
         {/* BOTÃO */}
         <TouchableOpacity style={styles.loginButton}>
@@ -87,35 +88,32 @@ export default function LoginScreen() {
         <Text style={styles.orText}>Ou cadastrar-se com</Text>
 
         <View style={styles.socialRow}>
-          <View style={styles.socialButton}>
-              <Image
-                source={require('../assets/images/G.png')}
-                style={styles.socialIcon}
-                resizeMode="contain"
-              />
-            </View>
-
-          <View style={styles.socialButton}>
-              <Image
-                source={require('../assets/images/F.png')}
-                style={styles.socialIconFacebook}
-                resizeMode="contain"
-              />
-            </View>
-          <View style={styles.socialButton}>
-              <Image
-                source={require('../assets/images/Digital.png')}
-                style={styles.socialIconDigital}
-                resizeMode="contain"
-              />
-            </View>
+          <View style={styles.socialRow}>
+            <TouchableOpacity style={styles.socialButton}>
+              <Ionicons name="logo-google" size={22} color="#2563EB" />
+            </TouchableOpacity>
+  
+            <TouchableOpacity style={styles.socialButton}>
+              <Ionicons name="logo-facebook" size={22} color="#2563EB" />
+            </TouchableOpacity>
+  
+            <TouchableOpacity style={styles.socialButton}>
+              <Ionicons name="finger-print" size={22} color="#2563EB" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* CADASTRO */}
         <Text style={styles.signupText}>
           Não tem uma conta?{' '}
-          <Text style={styles.signupLink}>Cadastrar-se</Text>
+          <Text
+            style={styles.signupLink}
+            onPress={() => router.push('/register')}
+          >
+            Cadastrar-se
+          </Text>
         </Text>
+                      
       </View>
     </View>
   );
@@ -211,7 +209,7 @@ const styles = StyleSheet.create({
 
   loginButton: {
     backgroundColor: '#2563EB',
-    paddingVertical: 14,
+    paddingVertical: 11,
     borderRadius: 30,
     alignItems: 'center',
     width: '70%',
@@ -226,7 +224,7 @@ const styles = StyleSheet.create({
 
   loginText: {
     color: '#FFFFFF',
-    fontSize: 24,
+    fontSize: 22,
     fontFamily: 'LeagueSpartan-SemiBold',
   },
 

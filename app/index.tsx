@@ -45,9 +45,13 @@ export default function HomeScreen() {
         </TouchableOpacity>
           
 
-        <TouchableOpacity style={styles.signupButton}>
+        <TouchableOpacity
+          style={styles.signupButton}
+          onPress={() => router.push('/register')}
+        >
           <Text style={styles.signupText}>Cadastrar-se</Text>
         </TouchableOpacity>
+          
       </View>
     </View>
   );
@@ -109,7 +113,7 @@ const styles = StyleSheet.create({
 
   loginButton: {
     backgroundColor: '#2563EB',
-    paddingVertical: 14,
+    paddingVertical: 11,
     borderRadius: 30,
     alignItems: 'center',
     width: '70%',
@@ -122,14 +126,14 @@ const styles = StyleSheet.create({
 
   loginText: {
     color: '#FFFFFF',
-    fontSize: 24,
+    fontSize: 22,
     fontFamily: 'LeagueSpartan-SemiBold',
   },
 
   signupButton: {
     marginTop: 12,
     backgroundColor: '#E6EEFF',
-    paddingVertical: 14,
+    paddingVertical: 11,
     borderRadius: 30,
     alignItems: 'center',
     width: '70%',
@@ -137,7 +141,7 @@ const styles = StyleSheet.create({
 
   signupText: {
     color: '#2563EB',
-    fontSize: 24,
+    fontSize: 22,
     fontFamily: 'LeagueSpartan-SemiBold',
   },
 });
