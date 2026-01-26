@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
@@ -10,10 +11,12 @@ import {
   View,
 } from 'react-native';
 
+
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState<'exams' | 'info'>('exams');
   const [exams, setExams] = useState<any[]>([]);
   const [openInfoIndex, setOpenInfoIndex] = useState<number | null>(null);
+  const router = useRouter();
 
   const infoExams = [
     {
@@ -167,9 +170,13 @@ export default function HomeScreen() {
                       <Text style={styles.infoText}>{item.description}</Text>
                     </View>
                 
-                    <TouchableOpacity style={styles.infoButton}>
+                    <TouchableOpacity
+                      style={styles.infoButton}
+                      onPress={() => router.push("/exam-details")}
+                    >
                       <Text style={styles.infoButtonText}>Saber mais</Text>
                     </TouchableOpacity>
+                                    
                   </>
                 )}
               </View>
@@ -358,43 +365,47 @@ const styles = StyleSheet.create({
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
-},
+  },
 
   infoHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-
+  },  
   infoTitle: {
     color: '#FFFFFF',
     fontFamily: 'LeagueSpartan-SemiBold',
-    fontSize: 16,
-  },
-
+    fontSize: 17,
+  },  
   infoDescription: {
     backgroundColor: '#DDE6FF',
     borderRadius: 14,
     padding: 12,
-    marginTop: 10,
-  },
-
+    height: 'auto',
+  },  
   infoText: {
-    fontSize: 11,
-    color: '#1F2937',
+    fontSize: 14,
+    marginBottom: 14,
+    marginTop: 14,
+    color: '#000000',
     textAlign: 'center',
-  },
-
+    fontFamily: 'LeagueSpartan-extraLight',
+    justifyContent: 'center', // vertical
+    alignItems: 'center',     // horizontal
+  },  
   infoButton: {
     backgroundColor: '#DDE6FF',
-    borderRadius: 30,
-    marginTop: 10,
-    paddingVertical: 8,
+    borderRadius: 35,
+    padding: 20,
+    marginBottom: 10,
     alignItems: 'center',
-  },
-
+    marginTop: 10,
+  },  
   infoButtonText: {
     color: '#2563EB',
-    fontFamily: 'LeagueSpartan-SemiBold',
+    fontFamily: 'LeagueSpartan-Medium',
+    fontSize: 17,
+    marginTop: -8,
+    marginBottom: -8,
   },
 });
