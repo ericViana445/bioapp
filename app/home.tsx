@@ -2,17 +2,34 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
-    FlatList,
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function HomeScreen() {
-  // 🔹 começa vazio
+  const [activeTab, setActiveTab] = useState<'exams' | 'info'>('exams');
   const [exams, setExams] = useState<any[]>([]);
+  const [openInfoIndex, setOpenInfoIndex] = useState<number | null>(null);
+
+  const infoExams = [
+    {
+      title: 'Hemograma Completo',
+      description:
+        'Avalia as células do sangue, auxiliando na identificação de anemias, infecções e alterações do sistema imunológico.',
+    },
+    { title: 'Perfil Lipídico' },
+    { title: 'Glicemia em Jejum' },
+    { title: 'Função Renal' },
+    { title: 'PCR – Indicador inflamatório' },
+  ];
+
+  function toggleInfo(index: number) {
+    setOpenInfoIndex(prev => (prev === index ? null : index));
+  }
 
   return (
     <View style={styles.container}>
@@ -22,7 +39,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View style={styles.userInfo}>
           <Image
-            source={require('../assets/images/avatar.png')} // pode trocar depois
+            source={require('../assets/images/avatar.png')}
             style={styles.avatar}
           />
           <View>
@@ -50,45 +67,116 @@ export default function HomeScreen() {
 
       {/* TABS */}
       <View style={styles.tabs}>
-        <TouchableOpacity style={styles.activeTab}>
-          <Text style={styles.activeTabText}>Meus Exames</Text>
+        <TouchableOpacity
+          style={activeTab === 'exams' ? styles.activeTab : styles.inactiveTab}
+          onPress={() => setActiveTab('exams')}
+        >
+          <Text
+            style={
+              activeTab === 'exams'
+                ? styles.activeTabText
+                : styles.inactiveTabText
+            }
+          >
+            Meus Exames
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.inactiveTab}>
-          <Text style={styles.inactiveTabText}>Informações</Text>
+        <TouchableOpacity
+          style={activeTab === 'info' ? styles.activeTab : styles.inactiveTab}
+          onPress={() => setActiveTab('info')}
+        >
+          <Text
+            style={
+              activeTab === 'info'
+                ? styles.activeTabText
+                : styles.inactiveTabText
+            }
+          >
+            Informações
+          </Text>
         </TouchableOpacity>
       </View>
 
-      {/* ADD EXAM */}
-      <TouchableOpacity style={styles.addExam}>
-        <View style={styles.plusCircle}>
-          <Ionicons name="add" size={26} color="#2563EB" />
-        </View>
-        <Text style={styles.addExamText}>Adicionar novo exame</Text>
-      </TouchableOpacity>
-
-      {/* HISTÓRICO */}
-      {exams.length === 0 ? (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyTitle}>Nenhum exame ainda</Text>
-          <Text style={styles.emptySubtitle}>
-            Adicione seu primeiro exame para começar seu histórico.
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={exams}
-          keyExtractor={(item, index) => String(index)}
-          contentContainerStyle={{ paddingBottom: 24 }}
-          renderItem={({ item }) => (
-            <View style={styles.examCard}>
-              <View style={styles.examInner}>
-                <Text style={styles.examTitle}>{item.title}</Text>
-                <Text style={styles.examSubtitle}>{item.description}</Text>
-              </View>
+      {/* ABA MEUS EXAMES */}
+      {activeTab === 'exams' && (
+        <>
+          <TouchableOpacity style={styles.addExam}>
+            <View style={styles.plusCircle}>
+              <Ionicons name="add" size={26} color="#2563EB" />
             </View>
+            <Text style={styles.addExamText}>Adicionar novo exame</Text>
+          </TouchableOpacity>
+
+          {exams.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>Nenhum exame ainda</Text>
+              <Text style={styles.emptySubtitle}>
+                Adicione seu primeiro exame para começar seu histórico.
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              data={exams}
+              keyExtractor={(_, index) => String(index)}
+              renderItem={({ item }) => (
+                <View style={styles.examCard}>
+                  <View style={styles.examInner}>
+                    <Text style={styles.examTitle}>{item.title}</Text>
+                    <Text style={styles.examSubtitle}>
+                      {item.description}
+                    </Text>
+                  </View>
+                </View>
+              )}
+            />
           )}
-        />
+        </>
+      )}
+
+      {/* ABA INFORMAÇÕES (ACCORDION) */}
+      {activeTab === 'info' && (
+        <View>
+          {infoExams.map((item, index) => {
+            const isOpen = openInfoIndex === index;
+
+            return (
+              <View key={index}>
+                {/* CARD AZUL (APENAS O TÍTULO) */}
+                <TouchableOpacity
+                  style={styles.infoCard}
+                  onPress={() => toggleInfo(index)}
+                  
+                >
+                  
+                  <Text style={[styles.infoTitle, { marginLeft: 10 }]}>
+                    {item.title}
+                  </Text>
+
+                  <Ionicons
+                    name={isOpen ? 'chevron-up' : 'chevron-down'}
+                    size={20}
+                    color="#FFFFFF"
+                  />
+                </TouchableOpacity>
+
+                {/* DESCRIÇÃO (CARD SEPARADO) */}
+                {isOpen && item.description && (
+                  <>
+                    <View style={styles.infoDescription}>
+                      <Text style={styles.infoText}>{item.description}</Text>
+                    </View>
+                
+                    <TouchableOpacity style={styles.infoButton}>
+                      <Text style={styles.infoButtonText}>Saber mais</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+            );
+
+          })}
+        </View>
       )}
     </View>
   );
@@ -137,9 +225,9 @@ const styles = StyleSheet.create({
   },
 
   iconButton: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 37,
+    height: 37,
+    borderRadius: 50,
     backgroundColor: '#E6EEFF',
     alignItems: 'center',
     justifyContent: 'center',
@@ -149,8 +237,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#DDE6FF',
     borderRadius: 30,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 16,
@@ -178,6 +266,7 @@ const styles = StyleSheet.create({
 
   activeTabText: {
     color: '#FFFFFF',
+    fontSize: 22,
     fontFamily: 'LeagueSpartan-SemiBold',
   },
 
@@ -191,6 +280,7 @@ const styles = StyleSheet.create({
 
   inactiveTabText: {
     color: '#2563EB',
+    fontSize: 22,
     fontFamily: 'LeagueSpartan-SemiBold',
   },
 
@@ -204,9 +294,9 @@ const styles = StyleSheet.create({
 
   plusCircle: {
     backgroundColor: '#FFFFFF',
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    width: 52,
+    height: 51,
+    borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 6,
@@ -215,7 +305,7 @@ const styles = StyleSheet.create({
   addExamText: {
     color: '#FFFFFF',
     fontSize: 14,
-    fontFamily: 'LeagueSpartan-SemiBold',
+    fontFamily: 'LeagueSpartan-Medium',
   },
 
   emptyState: {
@@ -258,5 +348,53 @@ const styles = StyleSheet.create({
   examSubtitle: {
     fontSize: 11,
     color: '#374151',
+  },
+
+  infoCard: {
+  backgroundColor: '#2563EB',
+  borderRadius: 35,
+  padding: 20,
+  marginBottom: 10,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+},
+
+  infoHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  infoTitle: {
+    color: '#FFFFFF',
+    fontFamily: 'LeagueSpartan-SemiBold',
+    fontSize: 16,
+  },
+
+  infoDescription: {
+    backgroundColor: '#DDE6FF',
+    borderRadius: 14,
+    padding: 12,
+    marginTop: 10,
+  },
+
+  infoText: {
+    fontSize: 11,
+    color: '#1F2937',
+    textAlign: 'center',
+  },
+
+  infoButton: {
+    backgroundColor: '#DDE6FF',
+    borderRadius: 30,
+    marginTop: 10,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+
+  infoButtonText: {
+    color: '#2563EB',
+    fontFamily: 'LeagueSpartan-SemiBold',
   },
 });
