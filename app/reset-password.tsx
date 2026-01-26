@@ -3,11 +3,11 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function ResetPasswordScreen() {
@@ -30,7 +30,7 @@ export default function ResetPasswordScreen() {
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={28} color="#2563EB" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Definir Senha</Text>
+        <Text style={styles.headerTitle}>Redefinir Senha</Text>
         <View style={{ width: 28 }} />
       </View>
 

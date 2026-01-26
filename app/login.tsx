@@ -70,9 +70,13 @@ export default function LoginScreen() {
                       
 
         {/* BOTÃO */}
-        <TouchableOpacity style={styles.loginButton}>
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={() => router.replace('/home')}
+        >
           <Text style={styles.loginText}>Entrar</Text>
         </TouchableOpacity>
+          
 
         {/* SOCIAL */}
         <Text style={styles.orText}>Ou cadastrar-se com</Text>
@@ -259,7 +263,6 @@ const styles = StyleSheet.create({
 
   signupText: {
     textAlign: 'center',
-
     fontSize: 13,
   },
 
