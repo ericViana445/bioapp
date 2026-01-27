@@ -52,10 +52,11 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.headerIcons}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="notifications-outline" size={20} color="#2563EB" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
+          
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => router.push("/settings")}
+          >
             <Ionicons name="settings-outline" size={20} color="#2563EB" />
           </TouchableOpacity>
         </View>

@@ -1,0 +1,231 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import {
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+} from "react-native";
+
+export default function Settings() {
+  const router = useRouter();
+
+  return (
+    <View style={styles.container}>
+      {/* HEADER */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={28} color="#2563EB" />
+        </TouchableOpacity>
+
+        <Text style={styles.headerTitle}>Meu Perfil</Text>
+
+        {/* Espaçador */}
+        <View style={{ width: 28 }} />
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* PERFIL */}
+        <View style={styles.profileContainer}>
+          <View style={styles.avatarWrapper}>
+            <Image
+              source={{ uri: "https://i.pravatar.cc/300" }}
+              style={styles.avatar}
+            />
+
+            <TouchableOpacity style={styles.editIcon}>
+              <Ionicons name="pencil" size={16} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.userName}>John Doe</Text>
+        </View>
+
+        {/* MENU */}
+        <View style={styles.menu}>
+          <MenuItem
+            icon="person-outline"
+            label="Perfil"
+            onPress={() => {}}
+            highlight
+          />
+
+          <MenuItem
+            icon="lock-closed-outline"
+            label="Política de Privacidade"
+            onPress={() => {}}
+          />
+
+          <MenuItem
+            icon="settings-outline"
+            label="Configurações"
+            onPress={() => {}}
+          />
+
+          <MenuItem
+            icon="help-circle-outline"
+            label="Help"
+            onPress={() => {}}
+          />
+
+          <MenuItem
+            icon="log-out-outline"
+            label="Logout"
+            onPress={() => {}}
+            danger
+          />
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+/* COMPONENTE DO ITEM */
+function MenuItem({
+  icon,
+  label,
+  onPress,
+  highlight,
+  danger,
+}: {
+  icon: any;
+  label: string;
+  onPress: () => void;
+  highlight?: boolean;
+  danger?: boolean;
+}) {
+  return (
+    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
+      <View style={styles.menuLeft}>
+        <View
+          style={[
+            styles.iconCircle,
+            highlight && styles.iconHighlight,
+          ]}
+        >
+          <Ionicons
+            name={icon}
+            size={20}
+            color={highlight ? "#2563EB" : "#2563EB"}
+          />
+        </View>
+
+        <Text
+          style={[
+            styles.menuText,
+            highlight && styles.menuTextHighlight,
+            danger && styles.menuTextDanger,
+          ]}
+        >
+          {label}
+        </Text>
+      </View>
+
+      <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
+    </TouchableOpacity>
+  );
+}
+
+/* STYLES */
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingTop: 56,
+    paddingBottom: 16,
+  },
+
+  headerTitle: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 26,
+    color: "#2563EB",
+    fontFamily: "LeagueSpartan-SemiBold",
+  },
+
+  profileContainer: {
+    alignItems: "center",
+    marginBottom: 32,
+  },
+
+  avatarWrapper: {
+    position: "relative",
+  },
+
+  avatar: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: "#E5E7EB",
+  },
+
+  editIcon: {
+    position: "absolute",
+    bottom: 6,
+    right: 6,
+    backgroundColor: "#2563EB",
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  userName: {
+    marginTop: 12,
+    fontSize: 20,
+    fontFamily: "LeagueSpartan-SemiBold",
+  },
+
+  menu: {
+    paddingHorizontal: 16,
+  },
+
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 14,
+  },
+
+  menuLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#E0E7FF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  iconHighlight: {
+    backgroundColor: "#DBEAFE",
+  },
+
+  menuText: {
+    fontSize: 16,
+    fontFamily: "LeagueSpartan-Medium",
+    color: "#111827",
+  },
+
+  menuTextHighlight: {
+    color: "#2563EB",
+  },
+
+  menuTextDanger: {
+    color: "#DC2626",
+  },
+});
