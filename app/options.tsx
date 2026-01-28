@@ -55,19 +55,13 @@ export default function Settings() {
           <MenuItem
             icon="lock-closed-outline"
             label="Política de Privacidade"
-            onPress={() => {}}
+            onPress={() => router.push("/PrivacyPolicyScreen")}
           />
 
           <MenuItem
             icon="settings-outline"
             label="Configurações"
             onPress={() => router.push("/settings")}
-          />
-
-          <MenuItem
-            icon="help-circle-outline"
-            label="Help"
-            onPress={() => {}}
           />
 
           <MenuItem

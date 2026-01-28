@@ -75,11 +75,17 @@ export default function RegisterScreen() {
         />
 
         {/* Termos */}
-        <Text style={styles.terms}>
-          Ao continuar, você concorda com os{' '}
-          <Text style={styles.link}>Termos de Uso</Text> e{' '}
-          <Text style={styles.link}>Política de Privacidade</Text>.
-        </Text>
+        <TouchableOpacity
+          onPress={() => router.push('/PrivacyPolicyScreen')}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.terms}>
+            Ao continuar, você concorda com os{' '}
+            <Text style={styles.link}>Termos de Uso</Text> e{' '}
+            <Text style={styles.link}>Política de Privacidade</Text>.
+          </Text>
+        </TouchableOpacity>
+          
 
         {/* BOTÃO */}
         <TouchableOpacity
