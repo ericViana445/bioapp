@@ -1,12 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function Settings() {
@@ -31,7 +31,7 @@ export default function Settings() {
         <View style={styles.profileContainer}>
           <View style={styles.avatarWrapper}>
             <Image
-              source={{ uri: "https://i.pravatar.cc/300" }}
+              source={require('../assets/images/avatar.png')}
               style={styles.avatar}
             />
 
@@ -48,7 +48,7 @@ export default function Settings() {
           <MenuItem
             icon="person-outline"
             label="Perfil"
-            onPress={() => {}}
+            onPress={() => router.push("/profile")}
             highlight
           />
 
@@ -180,13 +180,13 @@ const styles = StyleSheet.create({
   },
 
   userName: {
-    marginTop: 12,
-    fontSize: 20,
+    marginTop: 5,
+    fontSize: 24,
     fontFamily: "LeagueSpartan-SemiBold",
   },
 
   menu: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
   },
 
   menuItem: {
@@ -216,8 +216,8 @@ const styles = StyleSheet.create({
   },
 
   menuText: {
-    fontSize: 16,
-    fontFamily: "LeagueSpartan-Medium",
+    fontSize: 24,
+    fontFamily: "LeagueSpartan-SemiBold",
     color: "#111827",
   },
 
