@@ -1,19 +1,19 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useState } from "react";
 import {
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
-
+} from "react-native";
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
 
   return (
     <View style={styles.container}>
@@ -24,14 +24,20 @@ export default function ForgotPasswordScreen() {
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={28} color="#2563EB" />
         </TouchableOpacity>
+
+        <Text style={styles.headerTitle}>Esqueci Senha</Text>
+
+        {/* Espaçador */}
+        <View style={{ width: 28 }} />
       </View>
 
-      {/* CONTEÚDO */}
-      <View style={styles.content}>
-        <Text style={styles.title}>Esqueci senha</Text>
-
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
         <Text style={styles.subtitle}>
-          Por favor, insira seu email cadastrado para receber o codigo de verificação e redefinir sua senha.
+          Por favor, insira seu email cadastrado para receber o código de
+          verificação e redefinir sua senha.
         </Text>
 
         <Text style={styles.label}>Seu Email</Text>
@@ -48,58 +54,54 @@ export default function ForgotPasswordScreen() {
 
         <TouchableOpacity
           style={[
-            styles.resetButton,
-            { backgroundColor: email ? '#2563EB' : '#b1c1f5be' },
+            styles.button,
+            { backgroundColor: email ? "#2563EB" : "#B1C1F5" },
           ]}
           disabled={!email}
-          onPress={() => router.push('/verify-code')}
+          onPress={() => router.push("/verify-code")}
         >
-          <Text style={styles.resetText}>Verificar Email</Text>
+          <Text style={styles.buttonText}>Verificar Email</Text>
         </TouchableOpacity>
-        
-      
-      </View>
+      </ScrollView>
     </View>
   );
 }
+
+/* STYLES */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
 
   header: {
-    paddingTop: 56,
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
+    paddingTop: 56,
+    paddingBottom: 16,
   },
 
-  backButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
+  headerTitle: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 26,
+    color: "#2563EB",
+    fontFamily: "LeagueSpartan-SemiBold",
   },
 
   content: {
-    paddingHorizontal: 24,
-    marginTop: 32,
-  },
-
-  title: {
-    fontSize: 26,
-    color: '#2563EB',
-    fontFamily: 'LeagueSpartan-SemiBold',
-    marginBottom: 8,
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 40,
   },
 
   subtitle: {
-    fontSize: 12,
-    color: '#000000',
-    fontFamily: 'LeagueSpartan-light',
-    lineHeight: 18,
-    marginBottom: 24,
+    fontSize: 16,
+    color: "#111827",
+    fontFamily: "LeagueSpartan-Regular",
+    lineHeight: 22,
+    marginBottom: 32,
   },
 
   label: {
@@ -109,27 +111,27 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: '#EEF2FF',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 16,
-    fontFamily: 'LeagueSpartan-regul',
-    fontSize: 15,
+    backgroundColor: "#EEF2FF",
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    height: 56,
+    fontSize: 18,
+    fontFamily: "LeagueSpartan-Regular",
+    marginBottom: 20,
   },
 
-  resetButton: {
-    backgroundColor: '#b1c1f5be',
-    paddingVertical: 11,
-    borderRadius: 30,
-    alignItems: 'center',
-    width: '70%',
-    alignSelf: 'center',
+  button: {
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    width: "70%",
   },
 
-
-  resetText: {
-    color: '#FFFFFF',
-    fontSize: 22,
-    fontFamily: 'LeagueSpartan-SemiBold',
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 20,
+    fontFamily: "LeagueSpartan-SemiBold",
   },
 });

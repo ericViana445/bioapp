@@ -65,7 +65,7 @@ export default function LoginScreen() {
         </View>
 
         <TouchableOpacity onPress={() => router.push('forgot-password')}>
-          <Text style={styles.forgot}>Esqueci minha senha</Text>
+          <Text style={styles.forgot}>Esqueceu a Senha?</Text>
         </TouchableOpacity>
                       
 
@@ -164,12 +164,13 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: '#EEF2FF',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 16,
-    fontFamily: 'LeagueSpartan-regul',
-    fontSize: 15,
+    backgroundColor: "#EEF2FF",
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    height: 56,
+    fontSize: 18,
+    fontFamily: "LeagueSpartan-Regular",
+    marginBottom: 10,
   },
 
   passwordContainer: {
@@ -194,11 +195,12 @@ const styles = StyleSheet.create({
 
 
   forgot: {
-    color: '#2563EB',
-    fontSize: 13,
-    textAlign: 'right',
-    marginTop: 8,
-    marginBottom: 24,
+    marginTop: 5,
+    alignSelf: "flex-end",
+    fontSize: 16,
+    color: "#2563EB",
+    fontFamily: "LeagueSpartan-SemiBold",
+    marginBottom: 10,
   },
 
   loginButton: {

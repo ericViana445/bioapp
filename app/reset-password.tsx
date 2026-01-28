@@ -30,7 +30,9 @@ export default function ResetPasswordScreen() {
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={28} color="#2563EB" />
         </TouchableOpacity>
+
         <Text style={styles.headerTitle}>Redefinir Senha</Text>
+
         <View style={{ width: 28 }} />
       </View>
 
@@ -88,6 +90,9 @@ export default function ResetPasswordScreen() {
             { backgroundColor: isValid ? '#2563EB' : '#b1c1f5be' },
           ]}
           disabled={!isValid}
+          onPress={() => {
+            // ação de redefinir senha
+          }}
         >
           <Text style={styles.buttonText}>Criar Nova Senha</Text>
         </TouchableOpacity>
@@ -95,6 +100,8 @@ export default function ResetPasswordScreen() {
     </View>
   );
 }
+
+/* STYLES */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -106,6 +113,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 56,
     paddingHorizontal: 16,
+    paddingBottom: 8,
   },
 
   headerTitle: {
@@ -118,15 +126,15 @@ const styles = StyleSheet.create({
 
   content: {
     paddingHorizontal: 24,
-    marginTop: 32,
+    marginTop: 24,
   },
 
   subtitle: {
-    fontSize: 12,
-    color: '#000000',
-    fontFamily: 'LeagueSpartan-light',
-    lineHeight: 18,
-    marginBottom: 24,
+   fontSize: 16,
+    color: "#111827",
+    fontFamily: "LeagueSpartan-Regular",
+    lineHeight: 22,
+    marginBottom: 10,
   },
 
   label: {
@@ -147,22 +155,17 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     paddingVertical: 14,
-    fontFamily: 'LeagueSpartan-regular',
+    fontFamily: 'LeagueSpartan-Regular',
     fontSize: 15,
   },
 
   button: {
-    backgroundColor: '#2563EB',
     paddingVertical: 11,
     borderRadius: 30,
     alignItems: 'center',
     width: '70%',
-    shadowColor: '#2563EB',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-    elevation: 6,
     alignSelf: 'center',
+    marginTop: 12,
   },
 
   buttonText: {

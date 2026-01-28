@@ -156,12 +156,13 @@ export const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: '#EEF2FF',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 16,
-    fontFamily: 'LeagueSpartan-regul',
-    fontSize: 15,
+    backgroundColor: "#EEF2FF",
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    height: 56,
+    fontSize: 18,
+    fontFamily: "LeagueSpartan-Regular",
+    marginBottom: 10,
   },
 
   passwordContainer: {

@@ -1,22 +1,20 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useRef, useState } from 'react';
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useRef, useState } from "react";
 import {
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-} from 'react-native';
+} from "react-native";
 
 export default function VerifyCodeScreen() {
   const router = useRouter();
-
-  const [code, setCode] = useState(['', '', '', '', '']);
-
+  const [code, setCode] = useState(["", "", "", "", ""]);
   const inputs = useRef<Array<TextInput | null>>([]);
-
 
   function handleChange(text: string, index: number) {
     if (!/^\d?$/.test(text)) return;
@@ -30,17 +28,13 @@ export default function VerifyCodeScreen() {
     }
   }
 
-  const isComplete = code.every(digit => digit !== '');
-
-    function handleKeyPress(
-    e: any,
-    index: number
-  ) {
-    if (e.nativeEvent.key === 'Backspace' && code[index] === '' && index > 0) {
+  function handleKeyPress(e: any, index: number) {
+    if (e.nativeEvent.key === "Backspace" && code[index] === "" && index > 0) {
       inputs.current[index - 1]?.focus();
     }
   }
 
+  const isComplete = code.every((digit) => digit !== "");
 
   return (
     <View style={styles.container}>
@@ -51,15 +45,19 @@ export default function VerifyCodeScreen() {
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={28} color="#2563EB" />
         </TouchableOpacity>
+
+        <Text style={styles.headerTitle}>Verificação</Text>
+
+        <View style={{ width: 28 }} />
       </View>
 
-      {/* CONTEÚDO */}
-      <View style={styles.content}>
-        <Text style={styles.title}>Verifique seu Email</Text>
-
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+      >
         <Text style={styles.subtitle}>
-          Enviamos um código de verificação para o seu e-mail{'\n'}
-          Insira o código de 5 dígitos mencionado no e-mail.
+          Enviamos um código de verificação para o seu e-mail.
+          {"\n"}Insira o código de 5 dígitos abaixo.
         </Text>
 
         {/* CÓDIGO */}
@@ -68,17 +66,17 @@ export default function VerifyCodeScreen() {
             <TextInput
               key={index}
               ref={(ref) => {
-                  inputs.current[index] = ref;
-                }}
-                
+  inputs.current[index] = ref;
+}}
+
               style={[
                 styles.codeInput,
                 digit ? styles.codeFilled : styles.codeEmpty,
               ]}
               value={digit}
-              onChangeText={text => handleChange(text, index)}
+              onChangeText={(text) => handleChange(text, index)}
               keyboardType="number-pad"
-              onKeyPress={e => handleKeyPress(e, index)}
+              onKeyPress={(e) => handleKeyPress(e, index)}
               maxLength={1}
             />
           ))}
@@ -87,115 +85,112 @@ export default function VerifyCodeScreen() {
         {/* BOTÃO */}
         <TouchableOpacity
           style={[
-            styles.verifyButton,
-            { backgroundColor: isComplete ? '#2563EB' : '#b1c1f5be' },
+            styles.button,
+            { backgroundColor: isComplete ? "#2563EB" : "#B1C1F5" },
           ]}
           disabled={!isComplete}
-          onPress={() => router.push('/reset-password')}
+          onPress={() => router.push("/reset-password")}
         >
-          <Text style={styles.verifyText}>Verificar Código</Text>
+          <Text style={styles.buttonText}>Verificar Código</Text>
         </TouchableOpacity>
-        
 
         {/* REENVIAR */}
         <Text style={styles.resendText}>
-          Ainda não recebeu o e-mail?{' '}
+          Ainda não recebeu o e-mail?{" "}
           <Text style={styles.resendLink}>Reenviar email</Text>
         </Text>
-      </View>
+      </ScrollView>
     </View>
   );
 }
 
+/* STYLES */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
 
   header: {
-    paddingTop: 56,
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
+    paddingTop: 56,
+    paddingBottom: 16,
   },
 
-  backButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
+  headerTitle: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 26,
+    color: "#2563EB",
+    fontFamily: "LeagueSpartan-SemiBold",
   },
 
   content: {
-    paddingHorizontal: 24,
-    marginTop: 32,
-  },
-
-  title: {
-    fontSize: 26,
-    color: '#2563EB',
-    fontFamily: 'LeagueSpartan-SemiBold',
-    marginBottom: 8,
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 40,
   },
 
   subtitle: {
-    fontSize: 12,
-    color: '#000000',
-    fontFamily: 'LeagueSpartan-light',
-    lineHeight: 18,
-    marginBottom: 24,
+    fontSize: 16,
+    color: "#111827",
+    fontFamily: "LeagueSpartan-Regular",
+    lineHeight: 22,
+    marginBottom: 32,
   },
 
   codeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 24,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 40,
   },
 
   codeInput: {
     width: 52,
     height: 56,
-    borderRadius: 12,
-    textAlign: 'center',
+    borderRadius: 14,
+    textAlign: "center",
     fontSize: 20,
-    fontFamily: 'LeagueSpartan-SemiBold',
+    fontFamily: "LeagueSpartan-SemiBold",
   },
 
   codeFilled: {
     borderWidth: 1.5,
-    borderColor: '#2563EB',
+    borderColor: "#2563EB",
+    backgroundColor: "#EEF2FF",
   },
 
   codeEmpty: {
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: "#D1D5DB",
   },
 
-  verifyButton: {
-    backgroundColor: '#b1c1f5be',
-    paddingVertical: 11,
-    borderRadius: 30,
-    alignItems: 'center',
-    width: '70%',
-    alignSelf: 'center',
+  button: {
+    height: 56,
+    borderRadius: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    width: "70%",
   },
 
-  verifyText: {
-    color: '#FFFFFF',
-    fontSize: 22,
-    fontFamily: 'LeagueSpartan-SemiBold',
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 20,
+    fontFamily: "LeagueSpartan-SemiBold",
   },
 
   resendText: {
-    marginTop: 14,
-    textAlign: 'center',
-    fontSize: 12,
-    color: '#000000',
+    marginTop: 18,
+    textAlign: "center",
+    fontSize: 14,
+    color: "#111827",
   },
 
   resendLink: {
-    color: '#2563EB',
-    fontFamily: 'LeagueSpartan-SemiBold',
+    color: "#2563EB",
+    fontFamily: "LeagueSpartan-SemiBold",
   },
 });
