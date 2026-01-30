@@ -69,7 +69,7 @@ export default function Settings() {
 
           <MenuItem
             icon="log-out-outline"
-            label="Logout"
+            label="Sair"
             onPress={() => setShowLogoutConfirm(true)}
             danger
           />
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   },
 
   menuTextHighlight: {
-    color: "#2563EB",
+    color: "#000000",
   },
 
   menuTextDanger: {

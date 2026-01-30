@@ -1,15 +1,19 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+
 
 export default function Settings() {
   const router = useRouter();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
 
   return (
     <View style={styles.container}>
@@ -36,12 +40,45 @@ export default function Settings() {
 
           <MenuItem
             icon="trash-outline"
-            label="Deletar Conta"
-            onPress={() => {}}
+            label="Excluir Conta"
+            onPress={() => setShowDeleteConfirm(true)}
             danger
           />
+            
         </View>
       </ScrollView>
+      {showDeleteConfirm && (
+        <View style={styles.overlay}>
+          <View style={styles.modal}>
+            <Text style={styles.modalTitle}>Excluir conta</Text>
+
+            <Text style={styles.modalText}>
+              Esta ação é permanente e não poderá ser desfeita.
+              Tem certeza que deseja excluir sua conta?
+            </Text>
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setShowDeleteConfirm(false)}
+              >
+                <Text style={styles.cancelText}>Cancelar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => {
+                  setShowDeleteConfirm(false);
+                  // aqui entra a lógica real de deletar conta
+                }}
+              >
+                <Text style={styles.deleteText}>Excluir</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
+
     </View>
   );
 }
@@ -143,4 +180,69 @@ const styles = StyleSheet.create({
   menuTextDanger: {
     color: "#000000",
   },
+  overlay: {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(37, 99, 235, 0.35)",
+  justifyContent: "center",
+  alignItems: "center",
+},
+
+modal: {
+  width: "82%",
+  backgroundColor: "#FFFFFF",
+  borderRadius: 20,
+  padding: 20,
+},
+
+modalTitle: {
+  fontSize: 22,
+  fontFamily: "LeagueSpartan-SemiBold",
+  color: "#111827",
+  marginBottom: 8,
+},
+
+modalText: {
+  fontSize: 14,
+  fontFamily: "LeagueSpartan-ExtraLight",
+  color: "#374151",
+  lineHeight: 20,
+  marginBottom: 20,
+},
+
+modalActions: {
+  flexDirection: "row",
+  justifyContent: "flex-end",
+  gap: 12,
+},
+
+cancelButton: {
+  paddingVertical: 10,
+  paddingHorizontal: 18,
+  borderRadius: 20,
+  backgroundColor: "#E5E7EB",
+},
+
+cancelText: {
+  fontSize: 14,
+  fontFamily: "LeagueSpartan-SemiBold",
+  color: "#111827",
+},
+
+deleteButton: {
+  paddingVertical: 10,
+  paddingHorizontal: 18,
+  borderRadius: 20,
+  backgroundColor: "#DC2626",
+},
+
+deleteText: {
+  fontSize: 14,
+  fontFamily: "LeagueSpartan-SemiBold",
+  color: "#FFFFFF",
+},
+
 });
