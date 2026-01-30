@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
   Image,
   ScrollView,
@@ -11,6 +12,8 @@ import {
 
 export default function Settings() {
   const router = useRouter();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
 
   return (
     <View style={styles.container}>
@@ -67,11 +70,43 @@ export default function Settings() {
           <MenuItem
             icon="log-out-outline"
             label="Logout"
-            onPress={() => {}}
+            onPress={() => setShowLogoutConfirm(true)}
             danger
           />
+
         </View>
       </ScrollView>
+      {showLogoutConfirm && (
+  <View style={styles.overlay}>
+    <View style={styles.modal}>
+      <Text style={styles.modalTitle}>Sair da conta</Text>
+
+      <Text style={styles.modalText}>
+        Tem certeza que deseja sair da sua conta?
+      </Text>
+
+      <View style={styles.modalActions}>
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => setShowLogoutConfirm(false)}
+        >
+          <Text style={styles.cancelText}>Cancelar</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.confirmButton}
+          onPress={() => {
+            setShowLogoutConfirm(false);
+            // aqui você coloca o logout real depois
+          }}
+        >
+          <Text style={styles.confirmText}>Sair</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+)}
+
     </View>
   );
 }
@@ -222,4 +257,69 @@ const styles = StyleSheet.create({
   menuTextDanger: {
     color: "#DC2626",
   },
+  overlay: {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(37, 99, 235, 0.35)", // azul com transparência
+  justifyContent: "center",
+  alignItems: "center",
+},
+
+modal: {
+  width: "82%",
+  backgroundColor: "#FFFFFF",
+  borderRadius: 20,
+  padding: 20,
+},
+
+modalTitle: {
+  fontSize: 22,
+  fontFamily: "LeagueSpartan-SemiBold",
+  color: "#111827",
+  marginBottom: 8,
+},
+
+modalText: {
+  fontSize: 14,
+  fontFamily: "LeagueSpartan-ExtraLight",
+  color: "#374151",
+  lineHeight: 20,
+  marginBottom: 20,
+},
+
+modalActions: {
+  flexDirection: "row",
+  justifyContent: "flex-end",
+  gap: 12,
+},
+
+cancelButton: {
+  paddingVertical: 10,
+  paddingHorizontal: 18,
+  borderRadius: 20,
+  backgroundColor: "#E5E7EB",
+},
+
+cancelText: {
+  fontFamily: "LeagueSpartan-SemiBold",
+  fontSize: 14,
+  color: "#111827",
+},
+
+confirmButton: {
+  paddingVertical: 10,
+  paddingHorizontal: 18,
+  borderRadius: 20,
+  backgroundColor: "#2563EB",
+},
+
+confirmText: {
+  fontFamily: "LeagueSpartan-SemiBold",
+  fontSize: 14,
+  color: "#FFFFFF",
+},
+
 });
