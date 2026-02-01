@@ -13,7 +13,31 @@ import {
 
 export default function LoginScreen() {
   const router = useRouter();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+
+  function handleLogin() {
+    setError('');
+
+    if (!email || !password) {
+      setError('Preencha todos os campos.');
+      return;
+    }
+
+    // validação simples de email
+    if (!email.includes('@') || !email.includes('.')) {
+      setError('Email inválido.');
+      return;
+    }
+
+    // aqui futuramente entra o BACKEND
+    // por enquanto simulamos sucesso
+    router.replace('/home');
+  }
 
   return (
     <View style={styles.container}>
@@ -28,15 +52,15 @@ export default function LoginScreen() {
         <View style={{ width: 28 }} />
       </View>
 
-      {/* CONTEÚDO */}
       <View style={styles.content}>
         <Text style={styles.welcome}>Bem-Vindo</Text>
 
         <Text style={styles.description}>
           O Bio App ajuda você a compreender exames laboratoriais de forma clara
-          e educativa, explicando cada resultado e seus valores de referência,
-          para que você tenha mais conhecimento ao conversar com seu médico.
+          e educativa.
         </Text>
+
+        
 
         {/* EMAIL */}
         <Text style={styles.label}>Email ou número</Text>
@@ -44,6 +68,8 @@ export default function LoginScreen() {
           style={styles.input}
           placeholder="exemplo@exemplo.com"
           placeholderTextColor="#9CA3AF"
+          value={email}
+          onChangeText={setEmail}
         />
 
         {/* SENHA */}
@@ -54,6 +80,8 @@ export default function LoginScreen() {
             placeholder="********"
             placeholderTextColor="#9CA3AF"
             secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
           />
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
@@ -67,15 +95,19 @@ export default function LoginScreen() {
         <TouchableOpacity onPress={() => router.push('forgot-password')}>
           <Text style={styles.forgot}>Esqueceu a Senha?</Text>
         </TouchableOpacity>
-                      
+
+        {/* ERRO */}
+        {error !== '' && <Text style={styles.error}>{error}</Text>}
 
         {/* BOTÃO */}
         <TouchableOpacity
           style={styles.loginButton}
-          onPress={() => router.replace('/home')}
+          onPress={handleLogin}
         >
           <Text style={styles.loginText}>Entrar</Text>
         </TouchableOpacity>
+      </View>
+
           
 
         {/* SOCIAL */}
@@ -105,11 +137,10 @@ export default function LoginScreen() {
             onPress={() => router.push('/register')}
           >
             Cadastrar-se
-          </Text>
+          </Text>f
         </Text>
                       
       </View>
-    </View>
   );
 }
 
@@ -118,6 +149,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
+  error: {
+  color: '#DC2626',
+  fontSize: 14,
+  marginBottom: 10,
+  fontFamily: 'LeagueSpartan-SemiBold',
+  alignSelf: 'center',
+},
+
 
   header: {
     flexDirection: 'row',
