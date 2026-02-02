@@ -20,6 +20,8 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
 
   const handleRegister = async () => {
     setError('');
@@ -49,8 +51,8 @@ export default function RegisterScreen() {
       if (!response.ok) {
         setError(data.error || 'Erro ao cadastrar.');
       } else {
-        alert('Cadastro realizado com sucesso!');
-        router.replace('/login');
+        setShowSuccessModal(true);
+
       }
     } catch (err) {
       console.log(err);
@@ -61,8 +63,12 @@ export default function RegisterScreen() {
   };
 
   return (
+    
+    
     <View style={styles.container}>
-      <StatusBar style="dark" />
+      
+
+          <StatusBar style="dark" />
 
       {/* HEADER */}
       <View style={styles.header}>
@@ -177,6 +183,30 @@ export default function RegisterScreen() {
           </Text>
         </Text>
       </View>
+      {showSuccessModal && (
+      <View style={styles.overlay}>
+        <View style={styles.modal}>
+          <Text style={styles.modalTitle}>Cadastro realizado </Text>
+
+          <Text style={styles.modalText}>
+            Seu e-mail foi cadastrado com sucesso.
+            Agora você já pode acessar sua conta.
+          </Text>
+
+          <View style={styles.modalActions}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => {
+                setShowSuccessModal(false);
+                router.replace('/login');
+              }}
+            >
+              <Text style={styles.cancelButton}>Continuar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    )}
     </View>
   );
 }
@@ -199,4 +229,69 @@ const styles = StyleSheet.create({
   socialButton: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#EEF2FF', alignItems: 'center', justifyContent: 'center' },
   footer: { textAlign: 'center', fontSize: 13 },
   error: { color: '#DC2626', fontSize: 14, marginBottom: 10, fontFamily: 'LeagueSpartan-SemiBold', alignSelf: 'center'},
+  overlay: {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(37, 99, 235, 0.35)",
+  justifyContent: "center",
+  alignItems: "center",
+},
+
+modal: {
+  width: "82%",
+  backgroundColor: "#FFFFFF",
+  borderRadius: 20,
+  padding: 20,
+},
+
+modalTitle: {
+  fontSize: 22,
+  fontFamily: "LeagueSpartan-SemiBold",
+  color: "#111827",
+  marginBottom: 8,
+},
+
+modalText: {
+  fontSize: 14,
+  fontFamily: "LeagueSpartan-ExtraLight",
+  color: "#374151",
+  lineHeight: 20,
+  marginBottom: 20,
+},
+
+modalActions: {
+  flexDirection: "row",
+  justifyContent: "flex-end",
+  gap: 12,
+},
+
+cancelButton: {
+  paddingVertical: 10,
+  paddingHorizontal: 18,
+  borderRadius: 20,
+  backgroundColor: "#E5E7EB",
+},
+
+cancelText: {
+  fontSize: 14,
+  fontFamily: "LeagueSpartan-SemiBold",
+  color: "#111827",
+},
+
+confirmButton: {
+  paddingVertical: 10,
+  paddingHorizontal: 18,
+  borderRadius: 20,
+  backgroundColor: "#2563EB",
+},
+
+confirmText: {
+  fontSize: 14,
+  fontFamily: "LeagueSpartan-SemiBold",
+  color: "#FFFFFF",
+},
+
 });

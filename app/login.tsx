@@ -20,7 +20,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
-  function handleLogin() {
+  const handleLogin = async () => {
     setError('');
 
     if (!email || !password) {
@@ -28,16 +28,31 @@ export default function LoginScreen() {
       return;
     }
 
-    // validação simples de email
-    if (!email.includes('@') || !email.includes('.')) {
-      setError('Email inválido.');
-      return;
-    }
+    setLoading(true);
 
-    // aqui futuramente entra o BACKEND
-    // por enquanto simulamos sucesso
-    router.replace('/home');
-  }
+    try {
+      const response = await fetch('http://192.168.1.7:3333/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Erro ao fazer login.');
+      } else {
+        // ✅ Login OK
+        // depois aqui você pode salvar token / usuário
+        router.replace('/home');
+      }
+
+    } catch (err) {
+      setError('Erro de conexão.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -103,9 +118,13 @@ export default function LoginScreen() {
         <TouchableOpacity
           style={styles.loginButton}
           onPress={handleLogin}
+          disabled={loading}
         >
-          <Text style={styles.loginText}>Entrar</Text>
+          <Text style={styles.loginText}>
+            {loading ? 'Entrando...' : 'Entrar'}
+          </Text>
         </TouchableOpacity>
+          
       </View>
 
           
