@@ -26,7 +26,8 @@
           "backgroundColor": "#2563EB"
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-web-browser"
     ]
   }
 }
