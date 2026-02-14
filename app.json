@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "com.eric_viana.bioapp",
     "name": "bio-app",
     "slug": "bio-app",
     "version": "1.0.0",
@@ -11,7 +12,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#2563EB"
-      }
+      },
+      "package": "com.eric_viana.bioapp"
     },
     "web": {
       "favicon": "./assets/images/logo.png"
@@ -26,7 +28,8 @@
           "backgroundColor": "#2563EB"
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-web-browser"
     ]
   }
 }

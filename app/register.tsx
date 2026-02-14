@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as Google from 'expo-auth-session/providers/google';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import * as WebBrowser from 'expo-web-browser';
+import { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,7 +12,10 @@ import {
   View
 } from 'react-native';
 
+WebBrowser.maybeCompleteAuthSession();
+
 export default function RegisterScreen() {
+  
   const router = useRouter();
 
   const [name, setName] = useState('');
@@ -21,6 +26,85 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: '1083239186942-fvvhdnga9isdfduborg2as2j6cban6fj.apps.googleusercontent.com',
+    responseType: 'id_token',
+    usePKCE: false,
+  });
+
+  
+  
+  console.log('🔥 REQUEST OBJECT:', request);
+  console.log('🔥 REDIRECT URI:', request?.redirectUri);
+  
+  useEffect(() => {
+    console.log('📩 GOOGLE RESPONSE COMPLETA:', response);
+  
+    if (response?.type === 'success') {
+      console.log('✅ LOGIN SUCCESS');
+      console.log('🔐 AUTH OBJECT:', response.authentication);
+    
+      const { authentication } = response;
+      handleGoogleLogin(authentication?.idToken);
+    }
+  
+    if (response?.type === 'error') {
+      console.log('❌ GOOGLE ERROR:', response.error);
+    }
+  
+    if (response?.type === 'dismiss') {
+      console.log('⚠️ LOGIN DISMISSED');
+    }
+  
+  }, [response]);
+  
+  console.log(request?.redirectUri);
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      handleGoogleLogin(authentication?.idToken);
+    }
+  }, [response]);
+
+  const handleGoogleLogin = async (idToken: string | undefined) => {
+    console.log('📦 ID TOKEN RECEBIDO:', idToken);
+
+    if (!idToken) {
+      console.log('❌ ID TOKEN UNDEFINED');
+      return;
+    }
+
+    try {
+      console.log('🌍 ENVIANDO PARA BACKEND...');
+
+      const res = await fetch('http://192.168.1.7:3333/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+
+      console.log('📡 STATUS BACKEND:', res.status);
+
+      const data = await res.json();
+      console.log('📡 RESPOSTA BACKEND:', data);
+
+      if (!res.ok) {
+        console.log('❌ ERRO BACKEND:', data);
+        setError(data.error || 'Erro ao autenticar com Google.');
+        return;
+      }
+
+      console.log('🎉 JWT RECEBIDO:', data.token);
+
+      router.replace('/home');
+    } catch (err) {
+      console.log('🔥 ERRO FETCH:', err);
+      setError('Erro ao conectar com servidor.');
+    }
+  };
+
+
 
 
   const handleRegister = async () => {
@@ -162,10 +246,22 @@ export default function RegisterScreen() {
         {/* SOCIAL */}
         <Text style={styles.orText}>Ou cadastrar-se com</Text>
         <View style={styles.socialRow}>
-          <TouchableOpacity style={styles.socialButton}>
+          <TouchableOpacity
+            style={styles.socialButton}
+            disabled={!request}
+            onPress={async () => {
+              console.log('🟢 BOTÃO GOOGLE PRESSIONADO');
+              console.log('📍 REDIRECT NO MOMENTO DO CLICK:', request?.redirectUri);
+
+              const result = await promptAsync();
+              console.log('📤 RESULTADO DO promptAsync:', result);
+            }}
+
+
+          >
             <Ionicons name="logo-google" size={22} color="#2563EB" />
           </TouchableOpacity>
-
+            
           <TouchableOpacity style={styles.socialButton}>
             <Ionicons name="logo-facebook" size={22} color="#2563EB" />
           </TouchableOpacity>
