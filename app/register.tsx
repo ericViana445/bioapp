@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
@@ -9,6 +10,10 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+
+GoogleSignin.configure({
+  webClientId: "72054386552-7cv7760oookm45c8bdag1i4on7aikhl5.apps.googleusercontent.com",
+});
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -21,6 +26,68 @@ export default function RegisterScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const handleGoogleRegister = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      await GoogleSignin.hasPlayServices();
+
+      const signInResponse = await GoogleSignin.signIn();
+
+      // Pega tokens corretamente
+      const { idToken } = await GoogleSignin.getTokens();
+
+      const user = signInResponse.data?.user;
+
+      if (!user || !idToken) {
+        setError('Erro ao obter dados do Google.');
+        return;
+      }
+
+      const response = await fetch('http://192.168.1.9:3333/auth/google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: user.name,
+          email: user.email,
+          googleId: user.id,
+          idToken: idToken,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("RESPONSE:", data);
+
+      if (!response.ok) {
+        setError(data.error || 'Erro ao cadastrar com Google.');
+        return;
+      }
+
+      // Se precisar completar cadastro
+      if (data.needsCompletion) {
+        router.replace({
+          pathname: '/complete-profile',
+          params: { email: data.user.email }
+        });
+        return;
+      }
+      
+      // Se já estiver completo
+      router.replace('/home');
+
+      setShowSuccessModal(true);
+
+    } catch (error: any) {
+      console.log(error);
+      setError('Erro ao autenticar com Google.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   const handleRegister = async () => {
@@ -40,7 +107,7 @@ export default function RegisterScreen() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://192.168.1.7:3333/auth/register', {
+      const response = await fetch('http://192.168.1.9:3333/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, dob }),
@@ -162,7 +229,10 @@ export default function RegisterScreen() {
         {/* SOCIAL */}
         <Text style={styles.orText}>Ou cadastrar-se com</Text>
         <View style={styles.socialRow}>
-          <TouchableOpacity style={styles.socialButton}>
+          <TouchableOpacity
+            style={styles.socialButton}
+            onPress={handleGoogleRegister}
+          >
             <Ionicons name="logo-google" size={22} color="#2563EB" />
           </TouchableOpacity>
 

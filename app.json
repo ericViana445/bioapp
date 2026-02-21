@@ -8,6 +8,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "android": {
+      "package": "com.googleauth.android.bioapp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#2563EB"
@@ -24,6 +25,12 @@
           "image": "./assets/images/logo.png",
           "resizeMode": "contain",
           "backgroundColor": "#2563EB"
+        }
+      ],
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps._some_id_here_"
         }
       ],
       "expo-font"
