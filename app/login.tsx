@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
@@ -10,6 +11,9 @@ import {
   View
 } from 'react-native';
 
+GoogleSignin.configure({
+  webClientId: "72054386552-7cv7760oookm45c8bdag1i4on7aikhl5.apps.googleusercontent.com",
+});
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -20,7 +24,55 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
-  const handleLogin = async () => {
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      await GoogleSignin.hasPlayServices();
+
+      const signInResponse = await GoogleSignin.signIn();
+      const { idToken } = await GoogleSignin.getTokens();
+
+      if (!idToken) {
+        setError('Erro ao obter token do Google.');
+        return;
+      }
+
+      const response = await fetch('http://192.168.1.9:3333/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Erro ao autenticar com Google.');
+        return;
+      }
+
+      // 🔥 SALVAR TOKEN AQUI (AsyncStorage depois)
+      // await AsyncStorage.setItem('token', data.token);
+
+      if (data.needsCompletion) {
+        router.replace({
+          pathname: "/complete-profile",
+          params: { email: data.user.email },
+        });
+      } else {
+        router.replace('/home');
+      }
+
+    } catch (err) {
+      console.log(err);
+      setError('Erro ao autenticar com Google.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+    const handleLogin = async () => {
     setError('');
 
     if (!email || !password) {
@@ -31,7 +83,7 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://192.168.1.7:3333/auth/login', {
+      const response = await fetch('http://192.168.1.9:3333/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -42,9 +94,14 @@ export default function LoginScreen() {
       if (!response.ok) {
         setError(data.error || 'Erro ao fazer login.');
       } else {
-        // ✅ Login OK
-        // depois aqui você pode salvar token / usuário
-        router.replace('/home');
+      
+        // 🔥 salvar token depois
+      
+        if (data.needsCompletion) {
+          router.replace('/complete-profile');
+        } else {
+          router.replace('/home');
+        }
       }
 
     } catch (err) {
@@ -134,7 +191,10 @@ export default function LoginScreen() {
 
         <View style={styles.socialRow}>
           <View style={styles.socialRow}>
-            <TouchableOpacity style={styles.socialButton}>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={handleGoogleLogin}
+            >
               <Ionicons name="logo-google" size={22} color="#2563EB" />
             </TouchableOpacity>
   

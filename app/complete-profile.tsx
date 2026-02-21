@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import {
@@ -11,9 +11,12 @@ import {
     View,
 } from "react-native";
 
+
+
 export default function CompleteProfileScreen() {
   const router = useRouter();
   const [dob, setDob] = useState("");
+  const { email } = useLocalSearchParams();
 
   // Função para aplicar máscara automática DD/MM/YYYY
   const handleDobChange = (text: string) => {
@@ -80,10 +83,30 @@ export default function CompleteProfileScreen() {
             { backgroundColor: dob.length === 10 ? "#2563EB" : "#B1C1F5" },
           ]}
           disabled={dob.length !== 10}
-          onPress={() => {
-            // Aqui depois você chama o PATCH pro backend
-            router.replace("/home");
-          }}
+          onPress={async () => {
+          try {
+            const response = await fetch(
+              "http://192.168.1.9:3333/auth/update-dob",
+              {
+                method: "PATCH",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  email: email,
+                  dob: dob,
+                }),
+              }
+            );
+        
+            if (response.ok) {
+              router.replace("/home");
+            }
+        
+          } catch (error) {
+            console.log(error);
+          }
+        }}
         >
           <Text style={styles.buttonText}>Finalizar Cadastro</Text>
         </TouchableOpacity>
