@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -11,12 +12,24 @@ import {
   View,
 } from 'react-native';
 
-
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState<'exams' | 'info'>('exams');
   const [exams, setExams] = useState<any[]>([]);
   const [openInfoIndex, setOpenInfoIndex] = useState<number | null>(null);
   const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const storedUser = await AsyncStorage.getItem('user');
+
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    };
+
+    loadUser();
+  }, []);
 
   const infoExams = [
     {
@@ -46,8 +59,10 @@ export default function HomeScreen() {
             style={styles.avatar}
           />
           <View>
-            <Text style={styles.welcome}>Olá, Bem-Vindo de Volta</Text>
-            <Text style={styles.username}>John Doe</Text>
+            <Text style={styles.welcome}>Olá, Bem-Vindo</Text>
+            <Text style={styles.username}>
+              {user ? user.name : 'Seu nome aqui'}
+            </Text>
           </View>
         </View>
 

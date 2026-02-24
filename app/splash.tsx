@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
@@ -10,22 +11,34 @@ export default function SplashScreen() {
   const opacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const checkLogin = async () => {
+      const token = await AsyncStorage.getItem('token');
+    
+      // animação de fade
       Animated.timing(opacity, {
         toValue: 0,
-        duration: 2000, // suavidade da transição
+        duration: 1500,
         useNativeDriver: true,
       }).start(() => {
-        router.replace('/');
+        if (token) {
+          router.replace('/home');
+        } else {
+          router.replace('/');
+        }
       });
-    }, 2000);
-
+    };
+  
+    // pequena pausa só para mostrar splash
+    const timer = setTimeout(() => {
+      checkLogin();
+    }, 1500);
+  
     return () => clearTimeout(timer);
   }, []);
 
 
   return (
-    <Animated.View style={styles.container}>
+    <Animated.View style={[styles.container, { opacity }]}>
       <StatusBar style="light" />
       <Image
         source={require('../assets/images/logo-splash.png')}

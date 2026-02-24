@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -51,7 +52,9 @@ export default function LoginScreen() {
         setError(data.error || 'Erro ao autenticar com Google.');
         return;
       }
-
+      await AsyncStorage.setItem('token', data.token);
+      await AsyncStorage.setItem('user', JSON.stringify(data.user));
+      
       // 🔥 SALVAR TOKEN AQUI (AsyncStorage depois)
       // await AsyncStorage.setItem('token', data.token);
 
@@ -94,6 +97,15 @@ export default function LoginScreen() {
       if (!response.ok) {
         setError(data.error || 'Erro ao fazer login.');
       } else {
+
+        await AsyncStorage.setItem('token', data.token);
+        await AsyncStorage.setItem('user', JSON.stringify(data.user));
+              
+        if (data.needsCompletion) {
+          router.replace('/complete-profile');
+        } else {
+          router.replace('/home');
+        }
       
         // 🔥 salvar token depois
       
