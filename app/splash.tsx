@@ -31,7 +31,7 @@ export default function SplashScreen() {
     // pequena pausa só para mostrar splash
     const timer = setTimeout(() => {
       checkLogin();
-    }, 1500);
+    }, 1800);
   
     return () => clearTimeout(timer);
   }, []);

@@ -1,21 +1,49 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
+import { useEffect, useState } from 'react';
 import {
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+
 
 export default function Profile() {
   const router = useRouter();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [birthDate, setBirthDate] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  useEffect(() => {
+  const loadUser = async () => {
+      const storedUser = await AsyncStorage.getItem('user');
+
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setName(parsedUser.name || '');
+        setEmail(parsedUser.email || '');
+        setBirthDate(parsedUser.dob || '');
+      }
+
+      setLoading(false);
+    };
+
+    loadUser();
+  }, []);
 
   return (
+
+    
     <View style={styles.container}>
       {/* HEADER — mesmo padrão */}
+      
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={28} color="#2563EB" />
@@ -40,7 +68,7 @@ export default function Profile() {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.userName}>John Doe</Text>
+          <Text style={styles.userName}>{name}</Text>
         </View>
 
         {/* FORMULÁRIO */}
@@ -48,38 +76,96 @@ export default function Profile() {
           <Text style={styles.label}>Nome Completo</Text>
           <TextInput
             style={styles.input}
-            value="John Doe"
-            placeholderTextColor="#9CA3AF"
-          />
-
-          <Text style={styles.label}>Telefone</Text>
-          <TextInput
-            style={styles.input}
-            value="+123 567 89000"
-            placeholderTextColor="#9CA3AF"
-            keyboardType="phone-pad"
+            value={name}
+            onChangeText={setName}
+            placeholder="Seu nome"
           />
 
           <Text style={styles.label}>Email</Text>
           <TextInput
             style={styles.input}
-            value="johndoe@example.com"
-            placeholderTextColor="#9CA3AF"
+            value={email}
+            onChangeText={setEmail}
             keyboardType="email-address"
+            autoCapitalize="none"
           />
 
           <Text style={styles.label}>Data de Nascimento</Text>
           <TextInput
             style={styles.input}
+            value={birthDate}
+            onChangeText={setBirthDate}
             placeholder="DD / MM / YYYY"
-            placeholderTextColor="#2563EB"
           />
 
-          <TouchableOpacity style={styles.updateButton}>
-            <Text style={styles.updateButtonText}>Atualizar Perfil</Text>
+          <TouchableOpacity
+            style={styles.updateButton}
+            onPress={async () => {
+              try {
+                const storedUser = await AsyncStorage.getItem('user');
+                if (!storedUser) return;
+              
+                const parsedUser = JSON.parse(storedUser);
+              
+                const response = await fetch(
+                  `http://192.168.1.9:3333/users/${parsedUser.id}`,
+                  {
+                    method: 'PUT',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      name,
+                      email,
+                      dob: birthDate,
+                    }),
+                  }
+                );
+              
+                if (!response.ok) {
+                  const text = await response.text();
+                  console.log("Erro do servidor:", text);
+                  alert("Erro ao atualizar perfil");
+                  return;
+                }
+
+                const updatedUser = await response.json();
+              
+                await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+              
+                setShowSuccessModal(true);
+              
+              } catch (error) {
+                console.log(error);
+              }
+            }}
+          >
+            <Text style={styles.updateButtonText}>
+              Atualizar Perfil
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+      {showSuccessModal && (
+  <View style={styles.overlay}>
+    <View style={styles.modal}>
+      <Text style={styles.modalTitle}>Perfil atualizado</Text>
+
+      <Text style={styles.modalText}>
+        Suas informações foram atualizadas com sucesso.
+      </Text>
+
+      <View style={styles.modalActions}>
+        <TouchableOpacity
+          style={styles.confirmButton}
+          onPress={() => setShowSuccessModal(false)}
+        >
+          <Text style={styles.confirmText}>OK</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+)}
     </View>
   );
 }
@@ -181,5 +267,55 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 22,
     fontFamily: "LeagueSpartan-SemiBold",
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(37, 99, 235, 0.35)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  modal: {
+    width: "82%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 20,
+  },
+
+  modalTitle: {
+    fontSize: 22,
+    fontFamily: "LeagueSpartan-SemiBold",
+    color: "#111827",
+    marginBottom: 8,
+  },
+
+  modalText: {
+    fontSize: 14,
+    fontFamily: "LeagueSpartan-ExtraLight",
+    color: "#374151",
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  
+  confirmButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 20,
+    backgroundColor: "#2563EB",
+  },
+  
+  confirmText: {
+    fontFamily: "LeagueSpartan-SemiBold",
+    fontSize: 14,
+    color: "#FFFFFF",
   },
 });

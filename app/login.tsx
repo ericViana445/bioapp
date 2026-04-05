@@ -40,7 +40,7 @@ export default function LoginScreen() {
         return;
       }
 
-      const response = await fetch('http://192.168.1.9:3333/auth/google', {
+      const response = await fetch('http://192.168.1.18:3333/auth/google', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken }),
@@ -86,7 +86,7 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://192.168.1.9:3333/auth/login', {
+      const response = await fetch('http://192.168.1.18:3333/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from 'react';
 import {
   Image,
   ScrollView,
@@ -13,6 +14,21 @@ import {
 export default function Settings() {
   const router = useRouter();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [userName, setUserName] = useState('');
+
+  useFocusEffect(
+   useCallback(() => {
+     const loadUser = async () => {
+       const user = await AsyncStorage.getItem('user');
+       if (user) {
+         const parsed = JSON.parse(user);
+         setUserName(parsed.name);
+       }
+     };
+    
+     loadUser();
+   }, [])
+) ;
 
 
   return (
@@ -43,7 +59,7 @@ export default function Settings() {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.userName}>John Doe</Text>
+          <Text style={styles.userName}>{userName}</Text>
         </View>
 
         {/* MENU */}
@@ -95,9 +111,10 @@ export default function Settings() {
 
         <TouchableOpacity
           style={styles.confirmButton}
-          onPress={() => {
+          onPress={async () => {
+            await AsyncStorage.removeItem('token');
             setShowLogoutConfirm(false);
-            // aqui você coloca o logout real depois
+            router.replace('/splash'); // volta pro login
           }}
         >
           <Text style={styles.confirmText}>Sair</Text>

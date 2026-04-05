@@ -1,15 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import {
-  FlatList,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 export default function HomeScreen() {
@@ -19,17 +18,18 @@ export default function HomeScreen() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
 
-  useEffect(() => {
-    const loadUser = async () => {
-      const storedUser = await AsyncStorage.getItem('user');
-
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
-    };
-
-    loadUser();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      const loadUser = async () => {
+        const storedUser = await AsyncStorage.getItem('user');
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      };
+    
+      loadUser();
+    }, [])
+  );
 
   const infoExams = [
     {
@@ -77,109 +77,80 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* SEARCH */}
-      <View style={styles.searchBox}>
-        <Ionicons name="options-outline" size={18} color="#2563EB" />
-        <Text style={styles.searchPlaceholder}>Buscar exame</Text>
-        <Ionicons name="search-outline" size={18} color="#2563EB" />
-      </View>
+      <View style={styles.cardsContainer}>
 
-      {/* TABS */}
-      <View style={styles.tabs}>
-        <TouchableOpacity
-          style={activeTab === 'exams' ? styles.activeTab : styles.inactiveTab}
-          onPress={() => setActiveTab('exams')}
-        >
-          <Text
-            style={
-              activeTab === 'exams'
-                ? styles.activeTabText
-                : styles.inactiveTabText
-            }
-          >
-            Meus Exames
+      {/* CONTEÚDO */}
+      <TouchableOpacity style={styles.card}>
+        <Image
+          source={require('../assets/images/books.png')}
+          style={styles.cardImage}
+        />
+        <View style={styles.cardText}>
+          <Text style={styles.cardTitle}>Conteúdo</Text>
+          <Text style={styles.cardSubtitle}>
+            Veja explicações e materiais de apoio
           </Text>
-        </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
 
-        <TouchableOpacity
-          style={activeTab === 'info' ? styles.activeTab : styles.inactiveTab}
-          onPress={() => setActiveTab('info')}
-        >
-          <Text
-            style={
-              activeTab === 'info'
-                ? styles.activeTabText
-                : styles.inactiveTabText
-            }
-          >
-            Informações
+      {/* DIAGNÓSTICO */}
+      <TouchableOpacity style={styles.card}>
+        <Image
+          source={require('../assets/images/exame.png')}
+          style={styles.cardImage}
+        />
+        <View style={styles.cardText}>
+          <Text style={styles.cardTitle}>Diagnóstico</Text>
+          <Text style={styles.cardSubtitle}>
+            Envie seus parâmetros
           </Text>
-        </TouchableOpacity>
-      </View>
+        </View>
+      </TouchableOpacity>
 
-      {/* ABA MEUS EXAMES */}
-      {activeTab === 'exams' && (
-        <>
-          <TouchableOpacity style={styles.addExam}>
-            <View style={styles.plusCircle}>
-              <Ionicons name="add" size={26} color="#2563EB" />
-            </View>
-            <Text style={styles.addExamText}>Adicionar novo exame</Text>
-          </TouchableOpacity>
+      {/* ATIVIDADES */}
+      <TouchableOpacity style={styles.card}>
+        <Image
+          source={require('../assets/images/study.png')}
+          style={styles.cardImage}
+        />
+        <View style={styles.cardText}>
+          <Text style={styles.cardTitle}>Atividades</Text>
+          <Text style={styles.cardSubtitle}>
+            Teste seus conhecimentos
+          </Text>
+        </View>
+      </TouchableOpacity>
 
-          {exams.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyTitle}>Nenhum exame ainda</Text>
-              <Text style={styles.emptySubtitle}>
-                Adicione seu primeiro exame para começar seu histórico.
-              </Text>
-            </View>
-          ) : (
-            <FlatList
-              data={exams}
-              keyExtractor={(_, index) => String(index)}
-              renderItem={({ item }) => (
-                <View style={styles.examCard}>
-                  <View style={styles.examInner}>
-                    <Text style={styles.examTitle}>{item.title}</Text>
-                    <Text style={styles.examSubtitle}>
-                      {item.description}
-                    </Text>
-                  </View>
-                </View>
-              )}
-            />
-          )}
-        </>
-      )}
+    </View>
 
-      {/* ABA INFORMAÇÕES (ACCORDION) */}
-      {activeTab === 'info' && (
-        <View>
-          {infoExams.map((item, index) => {
-            const isOpen = openInfoIndex === index;
 
-            return (
-              <View key={index}>
-                {/* CARD AZUL (APENAS O TÍTULO) */}
-                <TouchableOpacity
-                  style={styles.infoCard}
-                  onPress={() => toggleInfo(index)}
-                  
-                >
-                  
-                  <Text style={[styles.infoTitle, { marginLeft: 10 }]}>
-                    {item.title}
-                  </Text>
+          {/* ABA INFORMAÇÕES (ACCORDION) */}
+          {activeTab === 'info' && (
+            <View>
+              {infoExams.map((item, index) => {
+                const isOpen = openInfoIndex === index;
+              
+                return (
+                  <View key={index}>
+                    {/* CARD AZUL (APENAS O TÍTULO) */}
+                    <TouchableOpacity
+                      style={styles.infoCard}
+                      onPress={() => toggleInfo(index)}
 
-                  <Ionicons
-                    name={isOpen ? 'chevron-up' : 'chevron-down'}
-                    size={20}
-                    color="#FFFFFF"
-                  />
-                </TouchableOpacity>
+                    >
 
-                {/* DESCRIÇÃO (CARD SEPARADO) */}
+                      <Text style={[styles.infoTitle, { marginLeft: 10 }]}>
+                        {item.title}
+                      </Text>
+                
+                      <Ionicons
+                        name={isOpen ? 'chevron-up' : 'chevron-down'}
+                        size={20}
+                        color="#FFFFFF"
+                      />
+                    </TouchableOpacity>
+                
+                    {/* DESCRIÇÃO (CARD SEPARADO) */}
                 {isOpen && item.description && (
                   <>
                     <View style={styles.infoDescription}>
@@ -423,5 +394,41 @@ const styles = StyleSheet.create({
     fontSize: 17,
     marginTop: -8,
     marginBottom: -8,
+    },
+    cardsContainer: {
+    marginTop: 50,
+    gap: 20,
+    },
+
+  card: {
+    backgroundColor: '#CAD6FF', // azul claro
+    borderRadius: 20,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 140,
   },
-});
+
+  cardImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 60,
+    marginRight: 16,
+  },
+
+  cardText: {
+    flex: 1,
+  },
+
+  cardTitle: {
+    fontSize: 18,
+    color: '#2563EB',
+    fontFamily: 'LeagueSpartan-SemiBold',
+  },
+
+  cardSubtitle: {
+    fontSize: 13,
+    color: '#1F2937',
+    marginTop: 4,
+  },
+  });
