@@ -27,7 +27,7 @@ export default function HomeScreen() {
       type: 'application/pdf',
     } as any);
 
-    await fetch('http://192.168.1.18:3333/upload', {
+    await fetch('http://192.168.1.18:3333/pdf/upload', {
       method: 'POST',
       body: formData,
       headers: {
