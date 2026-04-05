@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as DocumentPicker from 'expo-document-picker';
 import { useFocusEffect, useRouter } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
@@ -17,7 +18,42 @@ export default function HomeScreen() {
   const [openInfoIndex, setOpenInfoIndex] = useState<number | null>(null);
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const uploadPDF = async (file: any) => {
+    const formData = new FormData();
 
+    formData.append('file', {
+      uri: file.uri,
+      name: file.name,
+      type: 'application/pdf',
+    } as any);
+
+    await fetch('http://192.168.1.18:3333/upload', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  };
+  const pickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: 'application/pdf',
+        copyToCacheDirectory: true,
+      });
+    
+      if (result.canceled === false) {
+        const file = result.assets[0];
+      
+        console.log('PDF selecionado:', file);
+      
+        // 🔥 AQUI QUE ENTRA
+        uploadPDF(file);
+      }
+    } catch (error) {
+      console.log('Erro ao selecionar PDF:', error);
+    }
+  };
   useFocusEffect(
     useCallback(() => {
       const loadUser = async () => {
@@ -97,7 +133,7 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       {/* DIAGNÓSTICO */}
-      <TouchableOpacity style={styles.card}>
+      <TouchableOpacity style={styles.card} onPress={pickDocument}>
         <Image
           source={require('../assets/images/exame.png')}
           style={styles.cardImage}
@@ -230,181 +266,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  searchBox: {
-    flexDirection: 'row',
-    backgroundColor: '#DDE6FF',
-    borderRadius: 30,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-
-  searchPlaceholder: {
-    fontSize: 13,
-    color: '#2563EB',
-    fontFamily: 'LeagueSpartan-Medium',
-  },
-
-  tabs: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
-  },
-
-  activeTab: {
-    flex: 1,
-    backgroundColor: '#2563EB',
-    borderRadius: 30,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-
-  activeTabText: {
-    color: '#FFFFFF',
-    fontSize: 22,
-    fontFamily: 'LeagueSpartan-SemiBold',
-  },
-
-  inactiveTab: {
-    flex: 1,
-    backgroundColor: '#E6EEFF',
-    borderRadius: 30,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-
-  inactiveTabText: {
-    color: '#2563EB',
-    fontSize: 22,
-    fontFamily: 'LeagueSpartan-SemiBold',
-  },
-
-  addExam: {
-    backgroundColor: '#2563EB',
-    borderRadius: 20,
-    alignItems: 'center',
-    paddingVertical: 20,
-    marginBottom: 20,
-  },
-
-  plusCircle: {
-    backgroundColor: '#FFFFFF',
-    width: 52,
-    height: 51,
-    borderRadius: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 6,
-  },
-
-  addExamText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontFamily: 'LeagueSpartan-Medium',
-  },
-
-  emptyState: {
-    alignItems: 'center',
-    marginTop: 32,
-  },
-
-  emptyTitle: {
-    fontSize: 16,
-    fontFamily: 'LeagueSpartan-SemiBold',
-    marginBottom: 6,
-  },
-
-  emptySubtitle: {
-    fontSize: 12,
-    color: '#6B7280',
-    textAlign: 'center',
-    maxWidth: 240,
-  },
-
-  examCard: {
-    backgroundColor: '#2563EB',
-    borderRadius: 20,
-    padding: 14,
-    marginBottom: 14,
-  },
-
-  examInner: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 14,
-  },
-
-  examTitle: {
-    fontSize: 14,
-    color: '#2563EB',
-    fontFamily: 'LeagueSpartan-SemiBold',
-  },
-
-  examSubtitle: {
-    fontSize: 11,
-    color: '#374151',
-  },
-
-  infoCard: {
-  backgroundColor: '#2563EB',
-  borderRadius: 35,
-  padding: 20,
-  marginBottom: 10,
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  },
-
-  infoHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },  
-  infoTitle: {
-    color: '#FFFFFF',
-    fontFamily: 'LeagueSpartan-SemiBold',
-    fontSize: 17,
-  },  
-  infoDescription: {
-    backgroundColor: '#DDE6FF',
-    borderRadius: 14,
-    padding: 12,
-    height: 'auto',
-  },  
-  infoText: {
-    fontSize: 14,
-    marginBottom: 14,
-    marginTop: 14,
-    color: '#000000',
-    textAlign: 'center',
-    fontFamily: 'LeagueSpartan-extraLight',
-    justifyContent: 'center', // vertical
-    alignItems: 'center',     // horizontal
-  },  
-  infoButton: {
-    backgroundColor: '#DDE6FF',
-    borderRadius: 35,
-    padding: 20,
-    marginBottom: 10,
-    alignItems: 'center',
-    marginTop: 10,
-  },  
-  infoButtonText: {
-    color: '#2563EB',
-    fontFamily: 'LeagueSpartan-Medium',
-    fontSize: 17,
-    marginTop: -8,
-    marginBottom: -8,
-    },
-    cardsContainer: {
+  cardsContainer: {
     marginTop: 50,
     gap: 20,
-    },
+  },
 
   card: {
-    backgroundColor: '#CAD6FF', // azul claro
+    backgroundColor: '#CAD6FF',
     borderRadius: 20,
     padding: 20,
     flexDirection: 'row',
@@ -434,4 +302,52 @@ const styles = StyleSheet.create({
     color: '#1F2937',
     marginTop: 4,
   },
-  });
+
+  infoCard: {
+    backgroundColor: '#2563EB',
+    borderRadius: 35,
+    padding: 20,
+    marginBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  infoTitle: {
+    color: '#FFFFFF',
+    fontFamily: 'LeagueSpartan-SemiBold',
+    fontSize: 17,
+  },
+
+  infoDescription: {
+    backgroundColor: '#DDE6FF',
+    borderRadius: 14,
+    padding: 12,
+  },
+
+  infoText: {
+    fontSize: 14,
+    marginBottom: 14,
+    marginTop: 14,
+    color: '#000000',
+    textAlign: 'center',
+    fontFamily: 'LeagueSpartan-extraLight',
+  },
+
+  infoButton: {
+    backgroundColor: '#DDE6FF',
+    borderRadius: 35,
+    padding: 20,
+    marginBottom: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+
+  infoButtonText: {
+    color: '#2563EB',
+    fontFamily: 'LeagueSpartan-Medium',
+    fontSize: 17,
+    marginTop: -8,
+    marginBottom: -8,
+  },
+});
