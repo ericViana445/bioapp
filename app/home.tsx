@@ -80,7 +80,10 @@ export default function HomeScreen() {
       <View style={styles.cardsContainer}>
 
       {/* CONTEÚDO */}
-      <TouchableOpacity style={styles.card}>
+      <TouchableOpacity 
+        style={styles.card}
+        onPress={() => router.push("/contentHemogramaScreen")}
+        >
         <Image
           source={require('../assets/images/books.png')}
           style={styles.cardImage}
