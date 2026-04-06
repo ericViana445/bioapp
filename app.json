@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "bio-app",
+    "scheme": "bioapp",
     "slug": "bio-app",
     "version": "1.0.0",
     "orientation": "portrait",

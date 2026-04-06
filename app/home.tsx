@@ -1,9 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as DocumentPicker from 'expo-document-picker';
-import { useFocusEffect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import {
   Image,
   StyleSheet,
@@ -18,23 +18,50 @@ export default function HomeScreen() {
   const [openInfoIndex, setOpenInfoIndex] = useState<number | null>(null);
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+ 
+  // Função de upload do PDF
   const uploadPDF = async (file: any) => {
-    const formData = new FormData();
-
-    formData.append('file', {
-      uri: file.uri,
-      name: file.name,
-      type: 'application/pdf',
-    } as any);
-
-    await fetch('http://192.168.1.18:3333/pdf/upload', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    try {
+      const formData = new FormData();
+    
+      formData.append('file', {
+        uri: file.uri,
+        name: file.name,
+        type: 'application/pdf',
+      } as any);
+    
+      // 🔹 Faz a requisição para o backend
+      const response = await fetch('http://192.168.1.18:3333/pdf/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+    
+      // 🔹 Converte a resposta para JSON
+      const data = await response.json();
+    
+      // 🔹 Se deu certo, redireciona e envia os dados
+      if (response.ok) {
+        console.log('PDF enviado com sucesso:', data);
+      
+        // Salva os dados no AsyncStorage para usar na página returnData
+        await AsyncStorage.setItem('pdfData', JSON.stringify(data));
+      
+        // Redireciona para a página returnData
+        router.push('/returnData');
+      } else {
+        console.log('Erro no envio do PDF:', data);
+        alert('Erro ao enviar o PDF. Tente novamente.');
+      }
+    } catch (error) {
+      console.log('Erro no upload do PDF:', error);
+      alert('Erro no upload do PDF. Verifique sua conexão.');
+    }
   };
+  
+  // Função para selecionar o documento
   const pickDocument = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
@@ -42,30 +69,18 @@ export default function HomeScreen() {
         copyToCacheDirectory: true,
       });
     
-      if (result.canceled === false) {
+      if (!result.canceled && result.assets.length > 0) {
         const file = result.assets[0];
-      
         console.log('PDF selecionado:', file);
       
-        // 🔥 AQUI QUE ENTRA
-        uploadPDF(file);
+        // 🔥 Chama o upload e espera terminar
+        await uploadPDF(file);
       }
     } catch (error) {
       console.log('Erro ao selecionar PDF:', error);
+      alert('Erro ao selecionar o PDF.');
     }
   };
-  useFocusEffect(
-    useCallback(() => {
-      const loadUser = async () => {
-        const storedUser = await AsyncStorage.getItem('user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-      };
-    
-      loadUser();
-    }, [])
-  );
 
   const infoExams = [
     {
