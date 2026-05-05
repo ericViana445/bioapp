@@ -1,3 +1,4 @@
+import { API_URL } from '@/config/api';
 import { Ionicons } from '@expo/vector-icons';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { useRouter } from 'expo-router';
@@ -46,7 +47,7 @@ export default function RegisterScreen() {
         return;
       }
 
-      const response = await fetch('http://192.168.1.9:3333/auth/google', {
+      const response = await fetch(`${API_URL}/auth/google`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -107,7 +108,7 @@ export default function RegisterScreen() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://192.168.1.9:3333/auth/register', {
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, dob }),

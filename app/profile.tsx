@@ -1,3 +1,4 @@
+import { API_URL } from "@/config/api";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
@@ -108,7 +109,7 @@ export default function Profile() {
                 const parsedUser = JSON.parse(storedUser);
               
                 const response = await fetch(
-                  `http://192.168.1.9:3333/users/${parsedUser.id}`,
+                  `${API_URL}/users/${parsedUser.id}`,
                   {
                     method: 'PUT',
                     headers: {

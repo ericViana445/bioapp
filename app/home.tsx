@@ -11,6 +11,8 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { API_URL } from '../config/api';
+
 
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState<'exams' | 'info'>('exams');
@@ -31,7 +33,7 @@ export default function HomeScreen() {
       } as any);
     
       // 🔹 Faz a requisição para o backend
-      const response = await fetch('http://192.168.1.18:3333/pdf/upload', {
+      const response = await fetch(`${API_URL}/pdf/upload`, {
         method: 'POST',
         body: formData,
         headers: {

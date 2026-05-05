@@ -265,8 +265,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#2260FF',
     padding: 15,
     borderRadius: 15,
-    width: 150, 
-    marginBottom: 10,
+    width: 150,  
+    
   },
   teste: {
     marginLeft: 15,

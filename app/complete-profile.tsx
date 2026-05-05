@@ -3,14 +3,14 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-
+import { API_URL } from '../config/api';
 
 
 export default function CompleteProfileScreen() {
@@ -86,7 +86,7 @@ export default function CompleteProfileScreen() {
           onPress={async () => {
           try {
             const response = await fetch(
-              "http://192.168.1.9:3333/auth/update-dob",
+              `${API_URL}/auth/update-dob`,
               {
                 method: "PATCH",
                 headers: {

@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
+import { API_URL } from '../config/api';
 
 GoogleSignin.configure({
   webClientId: "72054386552-7cv7760oookm45c8bdag1i4on7aikhl5.apps.googleusercontent.com",
@@ -40,7 +41,7 @@ export default function LoginScreen() {
         return;
       }
 
-      const response = await fetch('http://192.168.1.18:3333/auth/google', {
+      const response = await fetch(`${API_URL}/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken }),
@@ -86,7 +87,7 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://192.168.1.18:3333/auth/login', {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
