@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as DocumentPicker from 'expo-document-picker';
 import { useRouter } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Image,
   StyleSheet,
@@ -20,6 +20,7 @@ export default function HomeScreen() {
   const [openInfoIndex, setOpenInfoIndex] = useState<number | null>(null);
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
  
   // Função de upload do PDF
   const uploadPDF = async (file: any) => {
@@ -99,6 +100,21 @@ export default function HomeScreen() {
   function toggleInfo(index: number) {
     setOpenInfoIndex(prev => (prev === index ? null : index));
   }
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const storedUser = await AsyncStorage.getItem('user');
+
+        if (storedUser) {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.log('Erro ao carregar usuário:', error);
+      }
+    };
+
+    loadUser();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -150,7 +166,10 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       {/* DIAGNÓSTICO */}
-      <TouchableOpacity style={styles.card} onPress={pickDocument}>
+      <TouchableOpacity
+          style={styles.card}
+          onPress={() => setShowDiagnosticModal(true)}
+        >
         <Image
           source={require('../assets/images/exame.png')}
           style={styles.cardImage}
@@ -228,6 +247,50 @@ export default function HomeScreen() {
           })}
         </View>
       )}
+        {showDiagnosticModal && (
+          <View style={styles.overlay}>
+            <View style={styles.modal}>
+                
+              {/* ❌ BOTÃO X */}
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setShowDiagnosticModal(false)}
+              >
+                <Ionicons name="close" size={22} color="#2563EB" />
+              </TouchableOpacity>
+                
+              <Text style={styles.modalTitle}>Inserir dados</Text>
+                
+              <Text style={styles.modalText}>
+                Como você deseja inserir os dados do exame?
+              </Text>
+                
+              <View style={styles.modalActions}>
+                
+                <TouchableOpacity
+                  style={styles.manualButton}
+                  onPress={() => {
+                    setShowDiagnosticModal(false);
+                    router.push('/manualData');
+                  }}
+                >
+                  <Text style={styles.manualText}>Manual</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  style={styles.confirmButton}
+                  onPress={async () => {
+                    setShowDiagnosticModal(false);
+                    await pickDocument();
+                  }}
+                >
+                  <Text style={styles.confirmText}>PDF</Text>
+                </TouchableOpacity>
+                
+              </View>
+            </View>
+          </View>
+        )}
     </View>
   );
 }
@@ -366,5 +429,94 @@ const styles = StyleSheet.create({
     fontSize: 17,
     marginTop: -8,
     marginBottom: -8,
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(37, 99, 235, 0.35)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  modal: {
+    width: "82%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 20,
+  },
+
+  modalTitle: {
+    fontSize: 22,
+    fontFamily: "LeagueSpartan-SemiBold",
+    color: "#111827",
+    marginBottom: 8,
+  },
+
+  modalText: {
+    fontSize: 14,
+    fontFamily: "LeagueSpartan-ExtraLight",
+    color: "#374151",
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 10,
+  },
+
+  cancelButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    backgroundColor: "#E5E7EB",
+  },
+
+  cancelText: {
+    fontFamily: "LeagueSpartan-SemiBold",
+    fontSize: 14,
+    color: "#111827",
+  },
+
+  manualButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    backgroundColor: "#DBEAFE",
+  },
+
+  manualText: {
+    fontFamily: "LeagueSpartan-SemiBold",
+    fontSize: 14,
+    color: "#2563EB",
+  },
+
+  confirmButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 20,
+    backgroundColor: "#2563EB",
+  },
+
+  confirmText: {
+    fontFamily: "LeagueSpartan-SemiBold",
+    fontSize: 14,
+    color: "#FFFFFF",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#E6EEFF",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

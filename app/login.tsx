@@ -9,12 +9,13 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import { API_URL } from '../config/api';
 
 GoogleSignin.configure({
-  webClientId: "72054386552-7cv7760oookm45c8bdag1i4on7aikhl5.apps.googleusercontent.com",
+  webClientId:
+    '72054386552-7cv7760oookm45c8bdag1i4on7aikhl5.apps.googleusercontent.com',
 });
 
 export default function LoginScreen() {
@@ -33,7 +34,7 @@ export default function LoginScreen() {
 
       await GoogleSignin.hasPlayServices();
 
-      const signInResponse = await GoogleSignin.signIn();
+      await GoogleSignin.signIn();
       const { idToken } = await GoogleSignin.getTokens();
 
       if (!idToken) {
@@ -53,21 +54,18 @@ export default function LoginScreen() {
         setError(data.error || 'Erro ao autenticar com Google.');
         return;
       }
+
       await AsyncStorage.setItem('token', data.token);
       await AsyncStorage.setItem('user', JSON.stringify(data.user));
-      
-      // 🔥 SALVAR TOKEN AQUI (AsyncStorage depois)
-      // await AsyncStorage.setItem('token', data.token);
 
       if (data.needsCompletion) {
         router.replace({
-          pathname: "/complete-profile",
+          pathname: '/complete-profile',
           params: { email: data.user.email },
         });
       } else {
         router.replace('/home');
       }
-
     } catch (err) {
       console.log(err);
       setError('Erro ao autenticar com Google.');
@@ -76,7 +74,7 @@ export default function LoginScreen() {
     }
   };
 
-    const handleLogin = async () => {
+  const handleLogin = async () => {
     setError('');
 
     if (!email || !password) {
@@ -84,9 +82,9 @@ export default function LoginScreen() {
       return;
     }
 
-    setLoading(true);
-
     try {
+      setLoading(true);
+
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -97,27 +95,19 @@ export default function LoginScreen() {
 
       if (!response.ok) {
         setError(data.error || 'Erro ao fazer login.');
-      } else {
-
-        await AsyncStorage.setItem('token', data.token);
-        await AsyncStorage.setItem('user', JSON.stringify(data.user));
-              
-        if (data.needsCompletion) {
-          router.replace('/complete-profile');
-        } else {
-          router.replace('/home');
-        }
-      
-        // 🔥 salvar token depois
-      
-        if (data.needsCompletion) {
-          router.replace('/complete-profile');
-        } else {
-          router.replace('/home');
-        }
+        return;
       }
 
+      await AsyncStorage.setItem('token', data.token);
+      await AsyncStorage.setItem('user', JSON.stringify(data.user));
+
+      if (data.needsCompletion) {
+        router.replace('/complete-profile');
+      } else {
+        router.replace('/home');
+      }
     } catch (err) {
+      console.log(err);
       setError('Erro de conexão.');
     } finally {
       setLoading(false);
@@ -128,12 +118,13 @@ export default function LoginScreen() {
     <View style={styles.container}>
       <StatusBar style="dark" />
 
-      {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={28} color="#2563EB" />
         </TouchableOpacity>
+
         <Text style={styles.headerTitle}>Entrar</Text>
+
         <View style={{ width: 28 }} />
       </View>
 
@@ -145,9 +136,6 @@ export default function LoginScreen() {
           e educativa.
         </Text>
 
-        
-
-        {/* EMAIL */}
         <Text style={styles.label}>Email ou número</Text>
         <TextInput
           style={styles.input}
@@ -155,9 +143,10 @@ export default function LoginScreen() {
           placeholderTextColor="#9CA3AF"
           value={email}
           onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
 
-        {/* SENHA */}
         <Text style={styles.label}>Senha</Text>
         <View style={styles.passwordContainer}>
           <TextInput
@@ -168,6 +157,7 @@ export default function LoginScreen() {
             value={password}
             onChangeText={setPassword}
           />
+
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
               name={showPassword ? 'eye-off-outline' : 'eye-outline'}
@@ -177,14 +167,12 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity onPress={() => router.push('forgot-password')}>
+        <TouchableOpacity onPress={() => router.push('/forgot-password')}>
           <Text style={styles.forgot}>Esqueceu a Senha?</Text>
         </TouchableOpacity>
 
-        {/* ERRO */}
         {error !== '' && <Text style={styles.error}>{error}</Text>}
 
-        {/* BOTÃO */}
         <TouchableOpacity
           style={styles.loginButton}
           onPress={handleLogin}
@@ -194,45 +182,31 @@ export default function LoginScreen() {
             {loading ? 'Entrando...' : 'Entrar'}
           </Text>
         </TouchableOpacity>
-          
       </View>
 
-          
+      <Text style={styles.orText}>Ou cadastrar-se com</Text>
 
-        {/* SOCIAL */}
-        <Text style={styles.orText}>Ou cadastrar-se com</Text>
+      <View style={styles.socialRow}>
+        <TouchableOpacity style={styles.socialButton} onPress={handleGoogleLogin}>
+          <Ionicons name="logo-google" size={22} color="#2563EB" />
+        </TouchableOpacity>
 
-        <View style={styles.socialRow}>
-          <View style={styles.socialRow}>
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={handleGoogleLogin}
-            >
-              <Ionicons name="logo-google" size={22} color="#2563EB" />
-            </TouchableOpacity>
-  
-            <TouchableOpacity style={styles.socialButton}>
-              <Ionicons name="logo-facebook" size={22} color="#2563EB" />
-            </TouchableOpacity>
-  
-            <TouchableOpacity style={styles.socialButton}>
-              <Ionicons name="finger-print" size={22} color="#2563EB" />
-            </TouchableOpacity>
-          </View>
-        </View>
+        <TouchableOpacity style={styles.socialButton}>
+          <Ionicons name="logo-facebook" size={22} color="#2563EB" />
+        </TouchableOpacity>
 
-        {/* CADASTRO */}
-        <Text style={styles.signupText}>
-          Não tem uma conta?{' '}
-          <Text
-            style={styles.signupLink}
-            onPress={() => router.push('/register')}
-          >
-            Cadastrar-se
-          </Text>f
+        <TouchableOpacity style={styles.socialButton}>
+          <Ionicons name="finger-print" size={22} color="#2563EB" />
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.signupText}>
+        Não tem uma conta?{' '}
+        <Text style={styles.signupLink} onPress={() => router.push('/register')}>
+          Cadastrar-se
         </Text>
-                      
-      </View>
+      </Text>
+    </View>
   );
 }
 
@@ -241,14 +215,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  error: {
-  color: '#DC2626',
-  fontSize: 14,
-  marginBottom: 10,
-  fontFamily: 'LeagueSpartan-SemiBold',
-  alignSelf: 'center',
-},
-
 
   header: {
     flexDirection: 'row',
@@ -256,9 +222,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 56,
     paddingBottom: 12,
-    
   },
-  
 
   headerTitle: {
     flex: 1,
@@ -283,7 +247,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 12,
     color: '#000000',
-    fontFamily: 'LeagueSpartan-light',
+    fontFamily: 'LeagueSpartan-Light',
     lineHeight: 18,
     marginBottom: 24,
   },
@@ -295,12 +259,12 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    backgroundColor: "#EEF2FF",
+    backgroundColor: '#EEF2FF',
     borderRadius: 14,
     paddingHorizontal: 16,
     height: 56,
     fontSize: 18,
-    fontFamily: "LeagueSpartan-Regular",
+    fontFamily: 'LeagueSpartan-Regular',
     marginBottom: 10,
   },
 
@@ -315,23 +279,25 @@ const styles = StyleSheet.create({
   passwordInput: {
     flex: 1,
     paddingVertical: 14,
-    fontFamily: 'LeagueSpartan-regular',
+    fontFamily: 'LeagueSpartan-Regular',
     fontSize: 15,
   },
 
-  eyeIcon: {
-      width: 22,
-      height: 22,
-    },
-
-
   forgot: {
     marginTop: 5,
-    alignSelf: "flex-end",
+    alignSelf: 'flex-end',
     fontSize: 16,
-    color: "#2563EB",
-    fontFamily: "LeagueSpartan-SemiBold",
+    color: '#2563EB',
+    fontFamily: 'LeagueSpartan-SemiBold',
     marginBottom: 10,
+  },
+
+  error: {
+    color: '#DC2626',
+    fontSize: 14,
+    marginBottom: 10,
+    fontFamily: 'LeagueSpartan-SemiBold',
+    alignSelf: 'center',
   },
 
   loginButton: {
@@ -348,7 +314,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 
-
   loginText: {
     color: '#FFFFFF',
     fontSize: 22,
@@ -361,22 +326,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginTop: 14,
   },
-  
-  socialIcon: {
-      width: 22,
-      height: 22,
-    },
-
-    socialIconFacebook: {
-      width: 27,   // 👈 menor
-      height: 27,
-    },
-
-    socialIconDigital: {
-      width: 26,   // 👈 maior
-      height: 26,
-    },
-
 
   socialRow: {
     flexDirection: 'row',
