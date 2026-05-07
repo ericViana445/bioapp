@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   Image,
   StyleSheet,
   Text,
@@ -15,6 +16,7 @@ import { API_URL } from '../config/api';
 
 
 export default function HomeScreen() {
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [activeTab, setActiveTab] = useState<'exams' | 'info'>('exams');
   const [exams, setExams] = useState<any[]>([]);
   const [openInfoIndex, setOpenInfoIndex] = useState<number | null>(null);
@@ -25,15 +27,16 @@ export default function HomeScreen() {
   // Função de upload do PDF
   const uploadPDF = async (file: any) => {
     try {
+      setIsAnalyzing(true);
+
       const formData = new FormData();
-    
+
       formData.append('file', {
         uri: file.uri,
         name: file.name,
         type: 'application/pdf',
       } as any);
-    
-      // 🔹 Faz a requisição para o backend
+
       const response = await fetch(`${API_URL}/pdf/upload`, {
         method: 'POST',
         body: formData,
@@ -41,18 +44,22 @@ export default function HomeScreen() {
           'Content-Type': 'multipart/form-data',
         },
       });
-    
-      // 🔹 Converte a resposta para JSON
+
       const data = await response.json();
-    
-      // 🔹 Se deu certo, redireciona e envia os dados
+
       if (response.ok) {
         console.log('PDF enviado com sucesso:', data);
-      
-        // Salva os dados no AsyncStorage para usar na página returnData
+
         await AsyncStorage.setItem('pdfData', JSON.stringify(data));
-      
-        // Redireciona para a página returnData
+
+        await AsyncStorage.setItem(
+          'activityData',
+          JSON.stringify({
+            examData: data,
+            questions: data.questions ?? [],
+          })
+        );
+
         router.push('/returnData');
       } else {
         console.log('Erro no envio do PDF:', data);
@@ -61,6 +68,8 @@ export default function HomeScreen() {
     } catch (error) {
       console.log('Erro no upload do PDF:', error);
       alert('Erro no upload do PDF. Verifique sua conexão.');
+    } finally {
+      setIsAnalyzing(false);
     }
   };
   
@@ -183,7 +192,8 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       {/* ATIVIDADES */}
-      <TouchableOpacity style={styles.card}>
+      <TouchableOpacity style={styles.card}
+      onPress={() => router.push("/activity")}>
         <Image
           source={require('../assets/images/study.png')}
           style={styles.cardImage}
@@ -288,6 +298,14 @@ export default function HomeScreen() {
                 </TouchableOpacity>
                 
               </View>
+            </View>
+          </View>
+        )}
+        {isAnalyzing && (
+          <View style={styles.loadingOverlay}>
+            <View style={styles.loadingBox}>
+              <ActivityIndicator size="large" color="#FFFFFF" />
+              <Text style={styles.loadingText}>Analisando exame...</Text>
             </View>
           </View>
         )}
@@ -518,5 +536,28 @@ const styles = StyleSheet.create({
     backgroundColor: "#E6EEFF",
     justifyContent: "center",
     alignItems: "center",
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(34, 96, 255, 0.54)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },  
+
+  loadingBox: {
+    alignItems: "center",
+    justifyContent: "center",
+  },  
+
+  loadingText: {
+    marginTop: 12,
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontFamily: "LeagueSpartan-SemiBold",
   },
 });

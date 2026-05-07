@@ -1,14 +1,15 @@
+import { API_URL } from "@/config/api";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import {
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function ManualDataScreen() {
@@ -25,76 +26,59 @@ export default function ManualDataScreen() {
     const [rbc, setRbc] = useState("");
 
   async function handleSubmit() {
-
     if (
       !birthDate ||
       !hemoglobina ||
       !hematocrito ||
+      !rbc ||
       !vcm ||
       !hcm ||
       !chcm ||
-      !rbc ||
       !rdw
     ) {
       setShowMissingDataModal(true);
       return;
     }
-    const manualData = {
-      patient: {
-        name: null,
-        birthDate,
-        age: null,
-      },
-      exam: {
-        type: "hemograma",
-        title: "Exame de Sangue - Resultado Educativo",
-      },
-      values: {
-        hemoglobina: {
-          value: hemoglobina || null,
-          unit: "g/dL",
-          status: "indefinido",
-        },
-        hematocrito: {
-          value: hematocrito || null,
-          unit: "%",
-          status: "indefinido",
-        },
-        vcm: {
-          value: vcm || null,
-          unit: "fL",
-          status: "indefinido",
-        },
-        rbc: {
-          value: rbc || null,
-          unit: "milhões/µL",
-          status: "indefinido",
-        },
-        hcm: {
-          value: hcm || null,
-          unit: "pg",
-          status: "indefinido",
-        },
-        chcm: {
-          value: chcm || null,
-          unit: "g/dL",
-          status: "indefinido",
-        },
-        rdw: {
-          value: rdw || null,
-          unit: "%",
-          status: "indefinido",
-        },
-      },
-      summary: {
-        mainFinding: "Dados inseridos manualmente.",
-        educationalInterpretation:
-          "Os valores foram informados manualmente pelo usuário e devem ser interpretados de forma educativa.",
-      },
-    };
 
-    await AsyncStorage.setItem("pdfData", JSON.stringify(manualData));
-    router.push("/returnData");
+    try {
+      const response = await fetch(`${API_URL}/ai/analyze-manual`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          birthDate,
+          hemoglobina,
+          hematocrito,
+          rbc,
+          vcm,
+          hcm,
+          chcm,
+          rdw,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.log("Erro IA manual:", data);
+        return;
+      }
+
+      await AsyncStorage.setItem("pdfData", JSON.stringify(data));
+
+      await AsyncStorage.setItem(
+        "activityData",
+        JSON.stringify({
+          examData: data,
+          questions: data.questions ?? [],
+        })
+      );
+
+      router.push("/returnData");
+    } catch (error) {
+      console.log("Erro ao enviar dados manuais:", error);
+    }
   }
   function formatDate(value: string) {
       // remove tudo que não é número

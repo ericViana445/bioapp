@@ -14,6 +14,7 @@ import {
 
 const exams = [
   {
+    label: 'Oq',
     unit: 'E?',
     title: 'Hemograma',
     image: require('../assets/images/exame.png'),

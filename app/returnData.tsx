@@ -233,7 +233,20 @@ export default function ReturnDataScreen() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={async () => {
+            await AsyncStorage.setItem(
+              "activityData",
+              JSON.stringify({
+                examData: pdfData,
+                questions: pdfData.questions ?? [],
+              })
+            );
+          
+            router.push("/activityFeedback");
+          }}
+        >
           <Text style={styles.buttonText}>Interpretar</Text>
         </TouchableOpacity>
       </ScrollView>
