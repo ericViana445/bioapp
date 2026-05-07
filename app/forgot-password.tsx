@@ -10,11 +10,57 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { API_URL } from '../config/api';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
+  async function handleForgotPassword() {
+  try {
+    setLoading(true);
+    setError("");
+
+    const response = await fetch(`${API_URL}/auth/forgot-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const text = await response.text();
+
+      console.log("STATUS:", response.status);
+      console.log("RESPOSTA BRUTA:", text);
+
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+        setError("O backend não retornou JSON. Verifique a rota ou o servidor.");
+        return;
+      }
+
+      if (!response.ok) {
+        setError(data.error || "Erro ao enviar código.");
+        return;
+      }
+
+      router.push({
+        pathname: "/verify-code",
+        params: { email },
+      });
+    } catch (error) {
+      console.log(error);
+      setError("Erro de conexão.");
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -51,16 +97,24 @@ export default function ForgotPasswordScreen() {
           value={email}
           onChangeText={setEmail}
         />
+        {error !== "" && (
+          <Text style={styles.error}>{error}</Text>
+        )}
 
         <TouchableOpacity
           style={[
             styles.button,
-            { backgroundColor: email ? "#2563EB" : "#B1C1F5" },
+            {
+              backgroundColor:
+                email && !loading ? "#2563EB" : "#B1C1F5",
+            },
           ]}
-          disabled={!email}
-          onPress={() => router.push("/verify-code")}
+          disabled={!email || loading}
+          onPress={handleForgotPassword}
         >
-          <Text style={styles.buttonText}>Verificar Email</Text>
+          <Text style={styles.buttonText}>
+            {loading ? "Enviando..." : "Verificar Email"}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -132,6 +186,12 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#FFFFFF",
     fontSize: 20,
+    fontFamily: "LeagueSpartan-SemiBold",
+  },
+  error: {
+    color: "#DC2626",
+    fontSize: 14,
+    marginBottom: 12,
     fontFamily: "LeagueSpartan-SemiBold",
   },
 });

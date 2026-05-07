@@ -90,12 +90,61 @@ export default function RegisterScreen() {
     }
   };
 
+  function isValidDate(dateString: string) {
+    if (dateString.length !== 10) return false;
+
+    const [day, month, year] = dateString.split("/").map(Number);
+
+    if (!day || !month || !year) return false;
+    if (year < 1900) return false;
+    if (year > new Date().getFullYear()) return false;
+    if (month < 1 || month > 12) return false;
+
+    const date = new Date(year, month - 1, day);
+
+    return (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day
+    );
+  }
+
+  function formatDate(value: string) {
+    let cleaned = value.replace(/\D/g, "");
+
+    cleaned = cleaned.slice(0, 8);
+
+    if (cleaned.length <= 2) {
+      return cleaned;
+    }
+
+    if (cleaned.length <= 4) {
+      return `${cleaned.slice(0, 2)}/${cleaned.slice(2)}`;
+    }
+
+    return `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}/${cleaned.slice(4)}`;
+  }
 
   const handleRegister = async () => {
     setError('');
 
     if (!name || !email || !password || !dob) {
       setError('Preencha todos os campos.');
+      return;
+    }
+
+    if (!name || !email || !password || !dob) {
+      setError("Preencha todos os campos.");
+      return;
+    }
+    
+    if (!isValidDate(dob)) {
+      setError("Data de nascimento inválida.");
+      return;
+    }
+    
+    if (!email.includes("@") || !email.includes(".")) {
+      setError("Email inválido.");
       return;
     }
 
@@ -194,13 +243,15 @@ export default function RegisterScreen() {
 
         {/* Data de Nascimento */}
         <Text style={styles.label}>Data de Nascimento</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="DD / MM / YYYY"
-          placeholderTextColor="#9CA3AF"
-          value={dob}
-          onChangeText={setDob}
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="DD/MM/AAAA"
+            placeholderTextColor="#9CA3AF"
+            value={dob}
+            onChangeText={(text) => setDob(formatDate(text))}
+            keyboardType="number-pad"
+            maxLength={10}
+          />
         {/* ERRO */}
         {error !== '' && <Text style={styles.error}>{error}</Text>}
 
@@ -237,13 +288,6 @@ export default function RegisterScreen() {
             <Ionicons name="logo-google" size={22} color="#2563EB" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.socialButton}>
-            <Ionicons name="logo-facebook" size={22} color="#2563EB" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.socialButton}>
-            <Ionicons name="finger-print" size={22} color="#2563EB" />
-          </TouchableOpacity>
         </View>
 
         {/* Footer */}

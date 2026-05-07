@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useRef, useState } from "react";
 import {
@@ -10,12 +10,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { API_URL } from "../config/api";
 
 export default function VerifyCodeScreen() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [code, setCode] = useState(["", "", "", "", ""]);
   const inputs = useRef<Array<TextInput | null>>([]);
-
+  const { email } = useLocalSearchParams<{ email: string }>();
   function handleChange(text: string, index: number) {
     if (!/^\d?$/.test(text)) return;
 
@@ -36,6 +39,42 @@ export default function VerifyCodeScreen() {
 
   const isComplete = code.every((digit) => digit !== "");
 
+  async function handleVerifyCode() {
+    try {
+      setLoading(true);
+      setError("");
+
+      const fullCode = code.join("");
+
+      const response = await fetch(`${API_URL}/auth/verify-code`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          code: fullCode,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Código inválido.");
+        return;
+      }
+
+      router.replace({
+        pathname: "/reset-password",
+        params: { email },
+      });
+    } catch (error) {
+      console.log(error);
+      setError("Erro de conexão.");
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -86,13 +125,20 @@ export default function VerifyCodeScreen() {
         <TouchableOpacity
           style={[
             styles.button,
-            { backgroundColor: isComplete ? "#2563EB" : "#B1C1F5" },
+            {
+              backgroundColor:
+                isComplete && !loading ? "#2563EB" : "#B1C1F5",
+            },
           ]}
-          disabled={!isComplete}
-          onPress={() => router.push("/reset-password")}
+          disabled={!isComplete || loading}
+          onPress={handleVerifyCode}
         >
-          <Text style={styles.buttonText}>Verificar Código</Text>
+          <Text style={styles.buttonText}>
+            {loading ? "Verificando..." : "Verificar Código"}
+          </Text>
         </TouchableOpacity>
+
+        {error !== "" && <Text style={styles.error}>{error}</Text>}
 
         {/* REENVIAR */}
         <Text style={styles.resendText}>
@@ -106,6 +152,13 @@ export default function VerifyCodeScreen() {
 
 /* STYLES */
 const styles = StyleSheet.create({
+  error: {
+    color: "#DC2626",
+    fontSize: 14,
+    marginBottom: 16,
+    textAlign: "center",
+    fontFamily: "LeagueSpartan-SemiBold",
+  },
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",

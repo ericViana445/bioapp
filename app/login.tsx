@@ -184,20 +184,13 @@ export default function LoginScreen() {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.orText}>Ou cadastrar-se com</Text>
+      <Text style={styles.orText}>Ou Entre com</Text>
 
       <View style={styles.socialRow}>
         <TouchableOpacity style={styles.socialButton} onPress={handleGoogleLogin}>
           <Ionicons name="logo-google" size={22} color="#2563EB" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.socialButton}>
-          <Ionicons name="logo-facebook" size={22} color="#2563EB" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.socialButton}>
-          <Ionicons name="finger-print" size={22} color="#2563EB" />
-        </TouchableOpacity>
       </View>
 
       <Text style={styles.signupText}>

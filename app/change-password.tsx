@@ -1,22 +1,83 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { API_URL } from "../config/api";
 
 export default function PasswordManager() {
   const router = useRouter();
-
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
+  async function handleChangePassword() {
+    try {
+      setError("");
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        setError("Preencha todos os campos.");
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        setError("As senhas não coincidem.");
+        return;
+      }
+
+      const storedUser = await AsyncStorage.getItem("user");
+
+      if (!storedUser) {
+        setError("Usuário não encontrado.");
+        return;
+      }
+
+      const user = JSON.parse(storedUser);
+
+      setLoading(true);
+
+      const response = await fetch(`${API_URL}/auth/change-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: user.email,
+          currentPassword,
+          newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Erro ao alterar senha.");
+        return;
+      }
+
+      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("user");
+
+      router.replace("/login");
+    } catch (error) {
+      console.log(error);
+      setError("Erro de conexão.");
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <View style={styles.container}>
       {/* HEADER */}
@@ -41,6 +102,8 @@ export default function PasswordManager() {
             secureTextEntry={!showCurrent}
             style={styles.input}
             placeholder="************"
+            value={currentPassword}
+            onChangeText={setCurrentPassword}
           />
           <TouchableOpacity onPress={() => setShowCurrent(!showCurrent)}>
             <Ionicons
@@ -62,6 +125,8 @@ export default function PasswordManager() {
             secureTextEntry={!showNew}
             style={styles.input}
             placeholder="************"
+            value={newPassword}
+            onChangeText={setNewPassword}
           />
           <TouchableOpacity onPress={() => setShowNew(!showNew)}>
             <Ionicons
@@ -79,6 +144,8 @@ export default function PasswordManager() {
             secureTextEntry={!showConfirm}
             style={styles.input}
             placeholder="************"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
           />
           <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
             <Ionicons
@@ -89,10 +156,16 @@ export default function PasswordManager() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-
+      {error !== "" && <Text style={styles.error}>{error}</Text>}
       {/* BUTTON */}
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Alterar Senha</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleChangePassword}
+        disabled={loading}
+      >
+        <Text style={styles.buttonText}>
+          {loading ? "Alterando..." : "Alterar Senha"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -100,6 +173,14 @@ export default function PasswordManager() {
 
 /* STYLES */
 const styles = StyleSheet.create({
+  error: {
+    color: "#DC2626",
+    fontSize: 14,
+    marginTop: 10,
+    textAlign: "center",
+    fontFamily: "LeagueSpartan-SemiBold",
+  },
+
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",

@@ -1,5 +1,6 @@
+import { API_URL } from '@/config/api';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import {
@@ -12,7 +13,9 @@ import {
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
-
+  const { email } = useLocalSearchParams<{ email: string }>();
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +24,53 @@ export default function ResetPasswordScreen() {
   const isValid =
     password.length >= 8 && password === confirmPassword;
 
+  async function handleResetPassword() {
+    try {
+      setError('');
+    
+      if (!password || !confirmPassword) {
+        setError('Preencha todos os campos.');
+        return;
+      }
+    
+      if (password.length < 8) {
+        setError('A senha deve ter pelo menos 8 caracteres.');
+        return;
+      }
+    
+      if (password !== confirmPassword) {
+        setError('As senhas não coincidem.');
+        return;
+      }
+    
+      setLoading(true);
+    
+      const response = await fetch(`${API_URL}/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          newPassword: password,
+        }),
+      });
+    
+      const data = await response.json();
+    
+      if (!response.ok) {
+        setError(data.error || 'Erro ao redefinir senha.');
+        return;
+      }
+    
+      router.replace('/login');
+    } catch (error) {
+      console.log(error);
+      setError('Erro de conexão.');
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
@@ -82,6 +132,7 @@ export default function ResetPasswordScreen() {
             />
           </TouchableOpacity>
         </View>
+        {error !== '' && <Text style={styles.error}>{error}</Text>}
 
         {/* BOTÃO */}
         <TouchableOpacity
@@ -90,11 +141,11 @@ export default function ResetPasswordScreen() {
             { backgroundColor: isValid ? '#2563EB' : '#b1c1f5be' },
           ]}
           disabled={!isValid}
-          onPress={() => {
-            // ação de redefinir senha
-          }}
+          onPress={handleResetPassword}
         >
-          <Text style={styles.buttonText}>Criar Nova Senha</Text>
+          <Text style={styles.buttonText}>
+            {loading ? 'Salvando...' : 'Criar Nova Senha'}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -103,6 +154,15 @@ export default function ResetPasswordScreen() {
 
 /* STYLES */
 const styles = StyleSheet.create({
+
+  error: {
+    color: '#DC2626',
+    fontSize: 14,
+    marginBottom: 10,
+    fontFamily: 'LeagueSpartan-SemiBold',
+    alignSelf: 'center',
+  },
+  
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
