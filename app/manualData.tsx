@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   StyleSheet,
   Text,
   TextInput,
@@ -14,7 +15,7 @@ import {
 
 export default function ManualDataScreen() {
   const router = useRouter();
-
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [birthDate, setBirthDate] = useState("");
   const [hemoglobina, setHemoglobina] = useState("");
   const [hematocrito, setHematocrito] = useState("");
@@ -22,12 +23,15 @@ export default function ManualDataScreen() {
   const [hcm, setHcm] = useState("");
   const [chcm, setChcm] = useState("");
   const [rdw, setRdw] = useState("");
-    const [showMissingDataModal, setShowMissingDataModal] = useState(false);
-    const [rbc, setRbc] = useState("");
+  const [showMissingDataModal, setShowMissingDataModal] = useState(false);
+  const [rbc, setRbc] = useState("");
+  const [showAiErrorModal, setShowAiErrorModal] = useState(false);
+  const [dateError, setDateError] = useState("");
 
   async function handleSubmit() {
     if (
       !birthDate ||
+      
       !hemoglobina ||
       !hematocrito ||
       !rbc ||
@@ -39,8 +43,15 @@ export default function ManualDataScreen() {
       setShowMissingDataModal(true);
       return;
     }
+    if (!isValidDate(birthDate)) {
+      setDateError("Data inválida.");
+      return;
+    }
 
+    setDateError("");
     try {
+      setIsAnalyzing(true);
+
       const response = await fetch(`${API_URL}/ai/analyze-manual`, {
         method: "POST",
         headers: {
@@ -60,8 +71,9 @@ export default function ManualDataScreen() {
 
       const data = await response.json();
 
-      if (!response.ok) {
+      if (!response.ok || data?.error) {
         console.log("Erro IA manual:", data);
+        setShowAiErrorModal(true);
         return;
       }
 
@@ -78,7 +90,27 @@ export default function ManualDataScreen() {
       router.push("/returnData");
     } catch (error) {
       console.log("Erro ao enviar dados manuais:", error);
+      setShowAiErrorModal(true);
+    } finally {
+      setIsAnalyzing(false);
     }
+  }
+  function isValidDate(date: string) {
+    if (date.length !== 10) return false;
+
+    const [day, month, year] = date.split("/").map(Number);
+
+    if (!day || !month || !year) return false;
+
+    if (month < 1 || month > 12) return false;
+
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    if (day < 1 || day > daysInMonth) return false;
+
+    if (year < 1900 || year > new Date().getFullYear()) return false;
+
+    return true;
   }
   function formatDate(value: string) {
       // remove tudo que não é número
@@ -123,6 +155,8 @@ export default function ManualDataScreen() {
               placeholderTextColor="#7EA2FF"
               keyboardType="numbers-and-punctuation"
             />
+
+
           </View>
 
           <View style={styles.halfField}>
@@ -169,11 +203,17 @@ export default function ManualDataScreen() {
         />
 
         <Field label="RDW:" value={rdw} onChangeText={setRdw} />
+        
+        {dateError !== "" && (
+              <Text style={styles.errorText}>{dateError}</Text>
+            )}
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          
           <Text style={styles.buttonText}>Seguir</Text>
         </TouchableOpacity>
       </View>
+      
       {showMissingDataModal && (
           <View style={styles.overlay}>
             <View style={styles.modal}>
@@ -193,6 +233,40 @@ export default function ManualDataScreen() {
               <TouchableOpacity
                 style={styles.confirmButton}
                 onPress={() => setShowMissingDataModal(false)}
+              >
+                <Text style={styles.confirmText}>Entendi</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+        {isAnalyzing && (
+          <View style={styles.loadingOverlay}>
+            <View style={styles.loadingBox}>
+              <ActivityIndicator size="large" color="#FFFFFF" />
+              <Text style={styles.loadingText}>Analisando exame...</Text>
+            </View>
+          </View>
+        )}
+        {showAiErrorModal && (
+          <View style={styles.overlay}>
+            <View style={styles.modal}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setShowAiErrorModal(false)}
+              >
+                <Ionicons name="close" size={22} color="#2563EB" />
+              </TouchableOpacity>
+
+              <Text style={styles.modalTitle}>Erro na análise</Text>
+
+              <Text style={styles.modalText}>
+                Não conseguimos analisar os dados agora.{"\n\n"}
+                Verifique sua conexão ou tente novamente em alguns instantes.
+              </Text>
+
+              <TouchableOpacity
+                style={styles.confirmButton}
+                onPress={() => setShowAiErrorModal(false)}
               >
                 <Text style={styles.confirmText}>Entendi</Text>
               </TouchableOpacity>
@@ -220,7 +294,7 @@ function Field({
         style={styles.fullInput}
         value={value}
         onChangeText={onChangeText}
-        placeholder="0000"
+        placeholder="000"
         placeholderTextColor="#7EA2FF"
         keyboardType="decimal-pad"
       />
@@ -229,6 +303,36 @@ function Field({
 }
 
 const styles = StyleSheet.create({
+  errorText: {
+    color: "#DC2626",
+    fontSize: 14,
+    marginTop: 2,
+    marginLeft: 120,
+    fontFamily: "LeagueSpartan-SemiBold",
+  },
+  loadingOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(34, 96, 255, 0.54)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999,
+  },
+
+  loadingBox: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  loadingText: {
+    marginTop: 12,
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontFamily: "LeagueSpartan-SemiBold",
+  },
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",

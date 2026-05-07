@@ -23,7 +23,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
- 
+  const [showInsufficientDataModal, setShowInsufficientDataModal] = useState(false);
   // Função de upload do PDF
   const uploadPDF = async (file: any) => {
     try {
@@ -50,8 +50,13 @@ export default function HomeScreen() {
       if (response.ok) {
         console.log('PDF enviado com sucesso:', data);
 
+        if (!hasRequiredExamData(data)) {
+          setShowInsufficientDataModal(true);
+          return;
+        }
+      
         await AsyncStorage.setItem('pdfData', JSON.stringify(data));
-
+      
         await AsyncStorage.setItem(
           'activityData',
           JSON.stringify({
@@ -125,8 +130,31 @@ export default function HomeScreen() {
     loadUser();
   }, []);
 
-  return (
-    <View style={styles.container}>
+  function hasRequiredExamData(data: any) {
+    const requiredFields = [
+      "hemoglobina",
+      "hematocrito",
+      "rbc",
+      "vcm",
+      "hcm",
+      "chcm",
+      "rdw",
+    ];  
+
+    return requiredFields.every((field) => {
+      const directValue = data?.[field];
+      const nestedValue = data?.values?.[field]?.value; 
+
+      return directValue !== null &&
+        directValue !== undefined &&
+        directValue !== "" ||
+        nestedValue !== null &&
+        nestedValue !== undefined &&
+        nestedValue !== "";
+    });
+  }
+   return (
+     <View style={styles.container}>
       <StatusBar style="dark" />
 
       {/* HEADER */}
@@ -184,9 +212,9 @@ export default function HomeScreen() {
           style={styles.cardImage}
         />
         <View style={styles.cardText}>
-          <Text style={styles.cardTitle}>Diagnóstico</Text>
+          <Text style={styles.cardTitle}>Interpretação interativa</Text>
           <Text style={styles.cardSubtitle}>
-            Envie seus parâmetros
+            Analise exames e aprenda de forma prática
           </Text>
         </View>
       </TouchableOpacity>
@@ -306,6 +334,31 @@ export default function HomeScreen() {
             <View style={styles.loadingBox}>
               <ActivityIndicator size="large" color="#FFFFFF" />
               <Text style={styles.loadingText}>Analisando exame...</Text>
+            </View>
+          </View>
+        )}
+        {showInsufficientDataModal && (
+          <View style={styles.overlay}>
+            <View style={styles.modal}>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setShowInsufficientDataModal(false)}
+              >
+                <Ionicons name="close" size={22} color="#2563EB" />
+              </TouchableOpacity>
+
+              <Text style={styles.modalTitle}>PDF com dados {"\n"}insuficientes</Text>
+
+              <Text style={styles.modalText}>
+                Não encontramos todos os dados necessários no PDF. Envie um hemograma completo ou preencha os dados manualmente.
+              </Text>
+
+              <TouchableOpacity
+                style={styles.confirmButton}
+                onPress={() => setShowInsufficientDataModal(false)}
+              >
+                <Text style={styles.confirmText}>Entendi</Text>
+              </TouchableOpacity>
             </View>
           </View>
         )}
